@@ -2,6 +2,7 @@
 #define MATRIX_ONE
 
 #include<cstdio>
+#include<cstdlib>
 
 using namespace std;
 
