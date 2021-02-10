@@ -1,6 +1,10 @@
 #ifndef MATRIX_ONE
 #define MATRIX_ONE
 
+#include<cstdio>
+
+using namespace std;
+
 class MatrixOne{
   private:
     int *array;
