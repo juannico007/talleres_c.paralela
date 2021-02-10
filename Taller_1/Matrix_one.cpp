@@ -14,6 +14,7 @@ MatrixOne::~MatrixOne(){
 	delete []array;
 }
 
+
 #include<Matrix_one.hpp>
 
 MatrixOne::MatrixOne& operator=(MatrixOne& M){
