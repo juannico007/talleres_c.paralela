@@ -1,5 +1,6 @@
 #ifndef MATRIX_ONE
 #define MATRIX_ONE
+
 class MatrixOne{
   private:
     int *array;
