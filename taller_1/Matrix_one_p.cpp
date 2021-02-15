@@ -55,6 +55,11 @@ void make_chunk(MatrixOne &M, int a, int b, int size, MatrixOne &M1, MatrixOne &
 }
 
 MatrixOne operator*(MatrixOne &M1, MatrixOne &M2){
+	if( M1.get_dimx() != M2.get_dimy() ){		//revisa si las dimensiones son compatibles
+		printf("dimensions m1: %d\n", M1.get_dimx());
+		printf("dimensions m2: %d\n", M2.get_dimy());
+		throw runtime_error("Multiplication: Matrix dimensions are not compatible!\n");
+	}
 	int y = M1.get_dimy(), x = M2.get_dimx();
 	int size = y*x;
 	MatrixOne res(y, x);
