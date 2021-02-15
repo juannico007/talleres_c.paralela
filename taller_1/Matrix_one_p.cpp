@@ -1,10 +1,4 @@
 #include"Matrix_one.hpp"
-double gettime(){
-	struct timeval tp;
-	gettimeofday(&tp, nullptr);
-	return tp.tv_sec + tp.tv_usec/(double)1.0e6;
-}
-
 
 MatrixOne::MatrixOne(int m, int n){
 	dimx = n;

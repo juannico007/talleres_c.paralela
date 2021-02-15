@@ -1,8 +1,8 @@
-#include "matrix_one.hpp"
-#include "helper.cpp"
+#include "Matrix_one.hpp"
+#include "helper.hpp"
 
-const int DIMX = 3;
-const int DIMY = 5;
+const int DIMX = 100;
+const int DIMY = 100;
 
 int main ( int argc , char ** argv ) {
 
@@ -10,7 +10,7 @@ int main ( int argc , char ** argv ) {
 
 		printf("error, quantity of entered parameters is less than expected\n");
 		printf("expected 1 and got: ");
-		cout << argc << endl;
+		printf("%d\n", argc);
 
 		return 0;
 	}
@@ -48,8 +48,8 @@ int main ( int argc , char ** argv ) {
 		time.push_back(tstop - tstart);
 	}
 
-	cout << endl;
-	cout << mean(time) << ", " << stdDeviation(time)<< ", "<< nreps << ", "<< size << endl;
+	printf("\n");
+  printf("%f, %f, %d, %d\n", mean(time), stdDeviation(time), nreps, size);
 
 	return 0;
 }
