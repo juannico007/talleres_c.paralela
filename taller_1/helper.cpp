@@ -1,5 +1,6 @@
 #include "helper.hpp"
 
+
 double gettime () {
 	struct timeval tp ;
 	gettimeofday(&tp, NULL) ;
@@ -12,9 +13,8 @@ double mean(vector<double> data){
 	double average = 0;
 
 	for(int i = 0; i < data.size(); i++)
-		average += data[i];
+		average += data[i]/data.size();
 
-	average /= data.size();
 
 	return average;
 }
@@ -26,9 +26,9 @@ double stdDeviation(vector<double> data){
 	double average = mean(data);
 
 	for(int i = 0; i < data.size(); i++)
-		variance += pow( (data[i] - average), 2 );
+		variance += pow( abs(data[i] - average), 2 );
 
-	variance /= data.size();
+	double ans = sqrt(variance/data.size());
 
-	return sqrt(variance);
+	return ans;
 }
