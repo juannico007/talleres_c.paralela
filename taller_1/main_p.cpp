@@ -26,10 +26,12 @@ int main ( int argc , char ** argv ) {
 
 	// int nthreads = atoi(argv[3]) > processor_count? processor_count : atoi(argv[3]);
 
-	vector<double> time;
+
 	for(int nthreads = 1; nthreads <= processor_count; nthreads++){
+		vector<double> time;
 		for (int reps = 0; reps < nreps; reps++){
 
+			double tstart = gettime ();
 			MatrixOne M1(DIMY, size, nthreads);
 			MatrixOne M2(size, DIMX, nthreads);
 
@@ -38,7 +40,6 @@ int main ( int argc , char ** argv ) {
 		//	M2.display ();
 		//	printf("\n");
 
-			double tstart = gettime ();
 			MatrixOne R = M1*M2;
 			double tstop = gettime ();
 
