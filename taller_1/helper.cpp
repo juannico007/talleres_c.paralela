@@ -1,4 +1,6 @@
 #include "helper.hpp"
+#include <cstdlib>
+#include <cstdio>
 
 double gettime () {
 	struct timeval tp ;
@@ -12,9 +14,8 @@ double mean(vector<double> data){
 	double average = 0;
 
 	for(int i = 0; i < data.size(); i++)
-		average += data[i];
+		average += data[i]/data.size();
 
-	average /= data.size();
 
 	return average;
 }
@@ -26,9 +27,10 @@ double stdDeviation(vector<double> data){
 	double average = mean(data);
 
 	for(int i = 0; i < data.size(); i++)
-		variance += pow( (data[i] - average), 2 );
+		variance += pow( abs(data[i] - average), 2 );
 
-	variance /= data.size();
+	printf("%f", variance);
+	double ans = sqrt(variance/data.size());
 
-	return sqrt(variance);
+	return ans;
 }
