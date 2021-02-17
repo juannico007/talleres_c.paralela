@@ -6,8 +6,11 @@ const int DIMY = 100;
 
 int main ( int argc , char ** argv ) {
 
+	/*Verifica que se pasaran todos los argumentos:
+	  Numero de columnas del primer vector que es igual al de filas del segundo
+		
+	*/
 	if (argc < 3){
-
 		printf("error, quantity of entered parameters is less than expected\n");
 		printf("expected 3 and got: ");
 		printf("%d\n", argc);
