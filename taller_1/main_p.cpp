@@ -27,7 +27,6 @@ int main ( int argc , char ** argv ) {
 	// int nthreads = atoi(argv[3]) > processor_count? processor_count : atoi(argv[3]);
 
 	vector<double> time;
-
 	for(int nthreads = 1; nthreads <= processor_count; nthreads++){
 		for (int reps = 0; reps < nreps; reps++){
 
@@ -60,6 +59,6 @@ int main ( int argc , char ** argv ) {
 		printf("\n");
 		printf("%f, %f, %d, %d, %d, %d\n", mean(time), stdDeviation(time), nreps, DIMY*size, size*DIMX, nthreads);
 
-		return 0;
 	}
+	return 0;
 }
