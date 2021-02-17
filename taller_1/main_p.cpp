@@ -6,12 +6,12 @@ const int DIMY = 100;
 
 int main ( int argc , char ** argv ) {
 
-	if (argc < 4){
+	if (argc < 3){
 
 		printf("error, quantity of entered parameters is less than expected\n");
-		printf("expected 4 and got: ");
+		printf("expected 3 and got: ");
 		printf("%d\n", argc);
-		printf("expected: size, number of repetitions for stdDeviation and median calculation, number of threads\n");
+		printf("expected: size, number of repetitions for stdDeviation and median calculation\n");
 		return 0;
 	}
 
@@ -24,40 +24,42 @@ int main ( int argc , char ** argv ) {
 	en caso de que la cantidad de hilos supere la cantidad de hilos disponibles en el computador
 	asigna el máximo de hilos posibles para el computador*/
 
-	int nthreads = atoi(argv[3]) > processor_count? processor_count : atoi(argv[3]);
+	// int nthreads = atoi(argv[3]) > processor_count? processor_count : atoi(argv[3]);
 
-	vector<double> time(nreps,0);
+	vector<double> time;
 
-	for (int reps = 0; reps < nreps; reps++){
+	for(int nthreads = 1; nthreads <= processor_count; nthreads++){
+		for (int reps = 0; reps < nreps; reps++){
 
-		MatrixOne M1(DIMY , size, nthreads);
-		MatrixOne M2(size , DIMX, nthreads);
+			MatrixOne M1(DIMY, size, nthreads);
+			MatrixOne M2(size, DIMX, nthreads);
 
-	//	M1.display ();
-	//	printf("\n");
-	//	M2.display ();
-	//	printf("\n");
+		//	M1.display ();
+		//	printf("\n");
+		//	M2.display ();
+		//	printf("\n");
 
-		double tstart = gettime ();
-		MatrixOne R = M1*M2;
-		double tstop = gettime ();
+			double tstart = gettime ();
+			MatrixOne R = M1*M2;
+			double tstop = gettime ();
 
-	//	R.display ();
-	//	printf("\n");
+		//	R.display ();
+		//	printf("\n");
 
-	//	M2 = M1;
-	//	M2.display();
-	//	printf("\n");
+		//	M2 = M1;
+		//	M2.display();
+		//	printf("\n");
 
 
-	//	printf (" %d\n",R. get (0 ,0));
-	//	printf (" Time : %f\n", tstop - tstart );
+		//	printf (" %d\n",R. get (0 ,0));
+		//	printf (" Time : %f\n", tstop - tstart );
 
-		time.push_back(tstop - tstart);
+			time.push_back(tstop - tstart);
+		}
+
+		printf("\n");
+		printf("%f, %f, %d, %d, %d, %d\n", mean(time), stdDeviation(time), nreps, DIMY*size, size*DIMX, nthreads);
+
+		return 0;
 	}
-
-	printf("\n");
-	printf("%f, %f, %d, %d, %d, %d\n", mean(time), stdDeviation(time), nreps, DIMY*size, size*DIMX, nthreads);
-
-	return 0;
 }

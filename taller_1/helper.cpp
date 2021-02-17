@@ -29,7 +29,6 @@ double stdDeviation(vector<double> data){
 	for(int i = 0; i < data.size(); i++)
 		variance += pow( abs(data[i] - average), 2 );
 
-	printf("%f", variance);
 	double ans = sqrt(variance/data.size());
 
 	return ans;
