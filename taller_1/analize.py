@@ -82,7 +82,7 @@ speedUpsMean = list(map(mean, speedUps))
 print(speedUpsMean)
 print()
 
-speedUpsStdDev = list(map(lambda x: stdDeviation(x), speedUps))
+speedUpsStdDev = list(map(stdDeviation, speedUps))
 print(speedUpsStdDev)
 print()
 
