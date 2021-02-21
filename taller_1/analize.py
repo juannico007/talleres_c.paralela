@@ -91,6 +91,44 @@ def getStdThread(data, nthreads):
         
     return devs
 
+def graphSpeedUpM(speedUps, stdDev, n):
+    y = [i for i in speedUps[n]]
+    x = [i for i in range(2,13)]
+    fig = plt.figure()
+    ax1 = fig.add_subplot()
+    ax1.set_ylabel('Speedup')
+    ax1.set_xlabel('Numbre of threads')
+    ax1.set_title('Speedups for size 10^{0}'.format(n + 4))
+    
+    speedUpU = [i+stdDev[n] for i in y]
+    speedUpL = [i-stdDev[n] for i in y]
+    
+    ax1.plot(x, y, color='b', lw=2)
+    ax1.plot(x, speedUpU, color='b', lw=0.3)
+    ax1.plot(x, speedUpL, color='b', lw=0.3)
+    ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
+    fig.savefig('Speedups for size 10^{0}'.format(n + 4))
+    plt.show()
+    
+def graphThreadMean(means, stdDev, n):
+    x = [4, 5, 6, 7, 8]
+    fig = plt.figure()
+    ax1 = fig.add_subplot()
+    ax1.set_ylabel('Mean (s)')
+    ax1.set_xlabel('Size of arrays (10^x)')
+    ax1.set_title('Mean of execution time for {0} thread'.format(n + 1))
+    
+    meanThreadP = [means[n][i] + stdDev[n][i] for i in range(len(means[n]))]
+    meanThreadL = [means[n][i] - stdDev[n][i] for i in range(len(means[n]))]
+    
+    ax1.plot(x, means[n], color='b', lw=2)
+    ax1.plot(x, meanThreadP, color='b', lw=0.3)
+    ax1.plot(x, meanThreadL, color='b', lw=0.3)
+    ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
+    fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
+    plt.show()
+    
+
 #USO DE TODAS LAS FUNCIONES
 
 df = pd.read_csv("time_data.csv")
@@ -114,203 +152,11 @@ print()
 stdThreads = getStdThread(df, 12)
 print("Standar desviation per thread:\n", stdThreads)
 
-x = [4, 5, 6, 7, 8]
 speedUpsMeanP = [speedUpsMean[i] + speedUpsStdDev[i] for i in range(len(speedUpsMean))]
 speedUpsMeanL = [speedUpsMean[i] - speedUpsStdDev[i] for i in range(len(speedUpsMean))]
 
-
-speedUpsG = plt.figure()
-ax1 = speedUpsG.add_subplot()
-ax1.set_ylabel('Speedups mean')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of speedups in matrix multiplication')
-
-ax1.plot(x, speedUpsMean, color='b', lw=2)
-ax1.plot(x, speedUpsMeanP, color='b', lw=0.3)
-ax1.plot(x, speedUpsMeanL, color='b', lw=0.3)
-ax1.fill_between(x, speedUpsMeanP, speedUpsMeanL, color = 'lightblue')
-
-
-
-#1 Thread 
-meanThread1 = plt.figure()
-ax1 = meanThread1.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 1 thread')
-
-meanThreadP = [meanThreads[0][i] + stdThreads[0][i] for i in range(len(meanThreads[0]))]
-meanThreadL = [meanThreads[0][i] - stdThreads[0][i] for i in range(len(meanThreads[0]))]
-
-ax1.plot(x, meanThreads[0], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#2 Threads
-meanThread2 = plt.figure()
-ax1 = meanThread2.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 2 threads')
-
-meanThreadP = [meanThreads[1][i] + stdThreads[1][i] for i in range(len(meanThreads[1]))]
-meanThreadL = [meanThreads[1][i] - stdThreads[1][i] for i in range(len(meanThreads[1]))]
-
-ax1.plot(x, meanThreads[1], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#3 Threads
-meanThread3 = plt.figure()
-ax1 = meanThread3.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 3 threads')
-
-meanThreadP = [meanThreads[2][i] + stdThreads[2][i] for i in range(len(meanThreads[2]))]
-meanThreadL = [meanThreads[2][i] - stdThreads[2][i] for i in range(len(meanThreads[2]))]
-
-ax1.plot(x, meanThreads[2], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#4 Threads
-meanThread4 = plt.figure()
-ax1 = meanThread4.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 4 threads')
-
-meanThreadP = [meanThreads[3][i] + stdThreads[3][i] for i in range(len(meanThreads[3]))]
-meanThreadL = [meanThreads[3][i] - stdThreads[3][i] for i in range(len(meanThreads[3]))]
-
-ax1.plot(x, meanThreads[3], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#5 Threads
-meanThread5 = plt.figure()
-ax1 = meanThread5.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 5 threads')
-
-meanThreadP = [meanThreads[4][i] + stdThreads[4][i] for i in range(len(meanThreads[4]))]
-meanThreadL = [meanThreads[4][i] - stdThreads[4][i] for i in range(len(meanThreads[4]))]
-
-ax1.plot(x, meanThreads[4], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#6 Threads
-meanThread6 = plt.figure()
-ax1 = meanThread6.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 6 threads')
-
-meanThreadP = [meanThreads[5][i] + stdThreads[5][i] for i in range(len(meanThreads[5]))]
-meanThreadL = [meanThreads[5][i] - stdThreads[5][i] for i in range(len(meanThreads[5]))]
-
-ax1.plot(x, meanThreads[5], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#7 Threads
-meanThread7 = plt.figure()
-ax1 = meanThread7.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 7 threads')
-
-meanThreadP = [meanThreads[6][i] + stdThreads[6][i] for i in range(len(meanThreads[6]))]
-meanThreadL = [meanThreads[6][i] - stdThreads[6][i] for i in range(len(meanThreads[6]))]
-
-ax1.plot(x, meanThreads[6], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#8 Threads
-meanThread8 = plt.figure()
-ax1 = meanThread8.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 8 threads')
-
-meanThreadP = [meanThreads[7][i] + stdThreads[7][i] for i in range(len(meanThreads[7]))]
-meanThreadL = [meanThreads[7][i] - stdThreads[7][i] for i in range(len(meanThreads[7]))]
-
-ax1.plot(x, meanThreads[7], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#9 Threads
-meanThread9 = plt.figure()
-ax1 = meanThread9.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 9 threads')
-
-meanThreadP = [meanThreads[8][i] + stdThreads[8][i] for i in range(len(meanThreads[8]))]
-meanThreadL = [meanThreads[8][i] - stdThreads[8][i] for i in range(len(meanThreads[8]))]
-
-ax1.plot(x, meanThreads[8], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#10 Threads
-meanThread1 = plt.figure()
-ax1 = meanThread1.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 10 threads')
-
-meanThreadP = [meanThreads[9][i] + stdThreads[9][i] for i in range(len(meanThreads[9]))]
-meanThreadL = [meanThreads[9][i] - stdThreads[9][i] for i in range(len(meanThreads[9]))]
-
-ax1.plot(x, meanThreads[9], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#11 Threads
-meanThread1 = plt.figure()
-ax1 = meanThread1.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 11 threads')
-
-meanThreadP = [meanThreads[10][i] + stdThreads[10][i] for i in range(len(meanThreads[10]))]
-meanThreadL = [meanThreads[10][i] - stdThreads[10][i] for i in range(len(meanThreads[10]))]
-
-ax1.plot(x, meanThreads[10], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-#12 Threads
-meanThread1 = plt.figure()
-ax1 = meanThread1.add_subplot()
-ax1.set_ylabel('Mean (s)')
-ax1.set_xlabel('Size of arrays (10^x)')
-ax1.set_title('Mean of execution time for 12 threads')
-
-meanThreadP = [meanThreads[11][i] + stdThreads[11][i] for i in range(len(meanThreads[11]))]
-meanThreadL = [meanThreads[11][i] - stdThreads[11][i] for i in range(len(meanThreads[11]))]
-
-ax1.plot(x, meanThreads[11], color='b', lw=2)
-ax1.plot(x, meanThreadP, color='b', lw=0.3)
-ax1.plot(x, meanThreadL, color='b', lw=0.3)
-ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-
-
-plt.show()
+for i in range(5):
+    graphSpeedUpM(speedUps, speedUpsStdDev, i)
+    
+for i in range(12):
+    graphThreadMean(meanThreads, stdThreads, i)
