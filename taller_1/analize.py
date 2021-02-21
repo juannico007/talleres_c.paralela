@@ -76,7 +76,7 @@ def getMeanThread(data, nthreads):
     means = [[] for i in range(nthreads)]          #Lista de listas con las medias de tiempo de cada hilo
     
     for i in range(len(data)):
-        means[i % 12].append(data.iloc[i]["mean"])
+        means[i % 12].append(data.iloc[i]["mean"])      #Añade en cada sublista la media de tiempo para cierto tamaño
         
     return means
 
@@ -84,16 +84,20 @@ def getStdThread(data, nthreads):
     #Funcion que dado el dataframe retorna una lista de listas con las medias de cada numero de hilos
     #Necesita el numero de hilos ocn los que se trabajo
     
-    devs = [[] for i in range(nthreads)]          #Lista de listas con las medias de tiempo de cada hilo
+    devs = [[] for i in range(nthreads)]          #Lista de listas con las deviaciones estandar de tiempo de cada hilo
     
     for i in range(len(data)):
-        devs[i % 12].append(data.iloc[i]["std dev"])
+        devs[i % 12].append(data.iloc[i]["std dev"])    #Añade en cada sublista la desviacion estandar para cada tamaño
         
     return devs
 
 def graphSpeedUpM(speedUps, stdDev, n):
+    #Funcion que dada una lista de listas de speedUps para cada tamaño de arreglo 
+    #grafica la media de speedups para cada numero de hilos
+    #Recibe la lista de speedups, la de desviaciones estandar y un numero que corresponde al tamaño del arreglo (10^n)
     y = [i for i in speedUps[n]]
     x = [i for i in range(2,13)]
+    
     fig = plt.figure()
     ax1 = fig.add_subplot()
     ax1.set_ylabel('Speedup')
@@ -107,10 +111,14 @@ def graphSpeedUpM(speedUps, stdDev, n):
     ax1.plot(x, speedUpU, color='b', lw=0.3)
     ax1.plot(x, speedUpL, color='b', lw=0.3)
     ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
+    
+    #Guarda la imagen en un archivo.jpg que esta en el pdf
     fig.savefig('Speedups for size 10^{0}'.format(n + 4))
-    plt.show()
     
 def graphThreadMean(means, stdDev, n):
+    #Funcion que dada una lista de medias por hilos, 
+    #Grafica la media de tiempo de ejecucion para varios tamaños de la matriz
+    #Recibe la lista de medias por hilo, una lista de desviaciones estandar por hilo y el numero de hilos a graficar
     x = [4, 5, 6, 7, 8]
     fig = plt.figure()
     ax1 = fig.add_subplot()
@@ -126,9 +134,9 @@ def graphThreadMean(means, stdDev, n):
     ax1.plot(x, meanThreadL, color='b', lw=0.3)
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
     plt.ylim([0,300])
+    #Guarda la imagen en un archivo.jpg que esta en el pdf
     fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
-    plt.show()
-    
+
 
 #USO DE TODAS LAS FUNCIONES
 
@@ -153,11 +161,11 @@ print()
 stdThreads = getStdThread(df, 12)
 print("Standar desviation per thread:\n", stdThreads)
 
-speedUpsMeanP = [speedUpsMean[i] + speedUpsStdDev[i] for i in range(len(speedUpsMean))]
-speedUpsMeanL = [speedUpsMean[i] - speedUpsStdDev[i] for i in range(len(speedUpsMean))]
 
+#Grafica la media de los speedups para cada tamaño del arreglo
 for i in range(5):
     graphSpeedUpM(speedUps, speedUpsStdDev, i)
-    
+
+#Grafica la media de tiempo de ejecucion para cada numero de hilos
 for i in range(12):
     graphThreadMean(meanThreads, stdThreads, i)
