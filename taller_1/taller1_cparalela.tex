@@ -16,6 +16,7 @@
 top= 2cm, bottom= 2cm]{geometry}
 \usepackage{fancyhdr}
 \usepackage{animate}
+\usepackage{hyperref}
 
 \title{Multiplicación matricial paralelizada}
 \author{David Alsina y Nicolás Quintero}
@@ -35,7 +36,9 @@ top= 2cm, bottom= 2cm]{geometry}
     \section{Resumen}
     
     Para el desarrollo de este taller construimos una clase que implementa una matriz como un arreglo unidimensional, y apartir de allí definimos la sobrecarga de operador para multipliación entre matrices. Esta clase posee la particularidad de que puede recibir como argumento en su construcción, la cantidad de hilos necesarios para ejecutar las operaciones que necesite realizar, haciéndola una herramienta muy versátil, ya que puede ejecutarse en forma serial (pasando como argumento 1) 
-    o puede ejecutarse en paralelo (pasando un 2 o un número mayor).
+    o puede ejecutarse en paralelo (pasando un 2 o un número mayor).\\
+    
+    Github: \href{https://github.com/juannico007/talleres_c.paralela.git}{\colorbox{blueMacc}{Poderoso git.}} 
     
     \section{Resultados}
 
