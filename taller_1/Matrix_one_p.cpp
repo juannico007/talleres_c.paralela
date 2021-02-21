@@ -44,15 +44,19 @@ MatrixOne::MatrixOne(int m, int n, int thr){
 	}
 }
 
+//Destructor
 MatrixOne::~MatrixOne(){
-
 	delete []array;
 }
 
+//Opreador de igualacion
 MatrixOne& MatrixOne::operator=(MatrixOne& M){
 
+	//Obtiene las dimensions de la segunda matriz
 	int x = M.get_dimx(), y = M.get_dimy();
 
+	//Si las dimensiones son distintas a las de la primera
+	//cambia las dimensiones de la primera
 	if(dimx != x || dimy != y){
 		dimx = x;
 		dimy = y;
@@ -62,12 +66,14 @@ MatrixOne& MatrixOne::operator=(MatrixOne& M){
 
 	int size = x*y;
 
+	//Iguala los elementos de la matriz
 	for(int i = 0; i < size; i++)
 		array[i] = M.array[i];
 
 	return *this;
 }
 
+//Muestra la matriz
 void MatrixOne::display(){
 
 	for(int y = 0; y < dimy; y++){
@@ -78,6 +84,7 @@ void MatrixOne::display(){
 
 }
 
+//Multiplica parte de las matrices M1 y M2 y guarda los resultados en la matriz M
 void make_chunk(MatrixOne &M, int a, int b, int size, MatrixOne &M1, MatrixOne &M2){
 
 	int x = M2.get_dimx();
@@ -85,10 +92,13 @@ void make_chunk(MatrixOne &M, int a, int b, int size, MatrixOne &M1, MatrixOne &
 
 	for(int i = a; i < b; i++){
 
+		//Extraigo las coordenadas de la entrada en la matriz
+		//correspondiente al indice i
 		int xi = i % x;
 		int yi = i / x;
 		int count = 0;
 
+		//Ejecuta la sumatoria y calcula la entrada
 		for(int j = 0; j < k; j++){
 			count += M1.get(j, yi) * M2.get(xi, j);
 		}
@@ -98,6 +108,7 @@ void make_chunk(MatrixOne &M, int a, int b, int size, MatrixOne &M1, MatrixOne &
 
 }
 
+//Operador de multiplicacion de matrices
 MatrixOne operator*(MatrixOne &M1, MatrixOne &M2){
 
 	if( M1.get_dimx() != M2.get_dimy() ){		//revisa si las dimensiones son compatibles
@@ -107,9 +118,11 @@ MatrixOne operator*(MatrixOne &M1, MatrixOne &M2){
 		throw runtime_error("Multiplication: Matrix dimensions are not compatible!\n");
 	}
 
+	//Obtiene las dimensiones de la matriz resultado
 	int y = M1.get_dimy(), x = M2.get_dimx();
 	int size = y*x;
 
+	//Asigna el numero de hilos para la matriz resultado
 	int thr = M1.get_threadNum() < M2.get_threadNum()? M2.get_threadNum() : M1.get_threadNum();
 	MatrixOne res(y, x, thr);
 	int n = res.get_threadNum();

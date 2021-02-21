@@ -23,7 +23,7 @@ class MatrixOne{
 
     int get_dimx() { return dimx; }
     int get_dimy() { return dimy; }
-	int get_threadNum(){ return threadsNum; }
+	  int get_threadNum(){ return threadsNum; }
     int get(int x, int y) { return array[y * dimx + x]; }
 
 
