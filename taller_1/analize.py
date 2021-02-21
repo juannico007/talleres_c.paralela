@@ -125,6 +125,7 @@ def graphThreadMean(means, stdDev, n):
     ax1.plot(x, meanThreadP, color='b', lw=0.3)
     ax1.plot(x, meanThreadL, color='b', lw=0.3)
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
+    plt.ylim([0,300])
     fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
     plt.show()
     
