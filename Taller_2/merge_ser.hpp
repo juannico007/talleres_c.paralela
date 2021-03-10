@@ -17,9 +17,10 @@ private:
   void fill_arr();
   void fill_non_rep_arr();
   void copy_vector(string name = "vector.dat");
+  void fill_zero();
 
 public:
-  DinArray(long size, int type = 3, string name = "vector.dat");
+  DinArray(long size, int type = 1, string name = "vector.dat");
   ~DinArray();
   int size() {return sz;}
   void display();
@@ -30,8 +31,8 @@ public:
 };
 
 
-void merge(DinArray v, int ini, int fin, DinArray tmp);
-void merge_sort(DinArray v, int ini, int fin, DinArray tmp);
+void merge(DinArray &v, int ini, int fin, DinArray &tmp);
+void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp);
 
 
 #endif
