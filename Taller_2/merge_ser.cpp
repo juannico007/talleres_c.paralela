@@ -1,8 +1,17 @@
 #include "merge_ser.hpp"
 
-DinArray::DinArray(long size, int type){
+DinArray::DinArray(long size, int type, string name){
   *p = new long[size];
   sz = size;
+  if(type == 1){
+    fill_arr();
+  }
+  else if (type == 2){
+    fill_non_rep_arr();
+  }
+  else if (type == 3){
+    copy_vector(name);
+  }
 }
 
 
@@ -41,8 +50,25 @@ void DinArray::fill_non_rep_arr(){
   }
 }
 
-void
+void DinArray::copy_vector(string name){
+  ifstream In(name);
+  for(long i = 0; i < size; ++i)
+    In >> a[i];
+  In.close();
+}
 
-long DinArray::size(){
+void DinArray::write_vector(string name){
+  ofstream Out(name);
+  for(long i = 0; i < size; ++i)
+    Out << a[i] << " ";
+  Out << "\n";
+  Out.close();
+}
 
+void DinArray::display(){
+  printf("[");
+  for(int i = 0; i < size - 1; i++){
+    printf("%d", p[i]);
+  }
+  printf("%d]\n", p[size - 1]);
 }
