@@ -9,7 +9,7 @@ DinArray::DinArray(long size, int type, string name){
 	p = new long[size];	//creates the dinamic array of the specified size
 
 	sz = size;			//stores the size in the local variable of the instance
-						
+
 
 	if(type == 1){	//fills the array using the specified method
 
@@ -41,7 +41,7 @@ DinArray::~DinArray(){
 
 void DinArray::fill_arr(){	//fills the array with a fixed random seed
 
-	minstd_rand0 rng(123);	
+	minstd_rand0 rng(123);
 
 	const long max_num = sz;
 
@@ -59,7 +59,7 @@ void DinArray::fill_non_rep_arr(){
 	minstd_rand0 rng(123);
 
 	const long max_num = 3 * sz;
-	
+
 	//use set to profit from the count method
 	std::set< long> numbers;
 	//Generation of a sequence of (pseudo)random numbers
@@ -132,7 +132,6 @@ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 	int pt = ini;
 
 	while (p1 < mid && p2 < fin){
-
 		if(v.get(p1) < v.get(p2)){
 		  tmp.set(pt, v.get(p1));
 		  p1++;
@@ -156,7 +155,7 @@ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 		pt++;
 		p2++;
 	}
-
+	
 	for(int i = ini; i < fin; i++){
 		v.set(i, tmp.get(i));
 	}
@@ -166,9 +165,8 @@ void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
   int mid = (fin + ini) / 2;
 
   if(ini < mid){
-    merge_sort(v, ini, mid, tmp); //divide 
-    merge_sort(v, mid, fin, tmp); //divide 
+    merge_sort(v, ini, mid, tmp); //divide
+    merge_sort(v, mid, fin, tmp); //divide
     merge(v, ini, fin, tmp);	  //conquer
   }
-
 }
