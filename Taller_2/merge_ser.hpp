@@ -11,22 +11,23 @@
 using namespace std;
 
 class DinArray{
+
 private:
-  long sz;
-  long *p;
-  void fill_arr();
-  void fill_non_rep_arr();
-  void copy_vector(string name = "vector.dat");
-  void fill_zero();
+	long sz;
+	long *p;
+	void fill_arr();
+	void fill_non_rep_arr();
+	void copy_vector(string name = "vector.dat");
+	void fill_zero();
 
 public:
-  DinArray(long size, int type = 1, string name = "vector.dat");
-  ~DinArray();
-  int size() {return sz;}
-  void display();
-  long get(long pos) {return p[pos];}
-  void set(long pos, long val) {p[pos] = val;}
-  void write_vector(string name = "vector.dat");
+	DinArray(long size, int type = 1, string name = "vector.dat");
+	~DinArray();
+	int size() {return sz;}
+	void display();
+	long get(long pos) {return p[pos];}
+	void set(long pos, long val) {p[pos] = val;}
+	void write_vector(string name = "vector.dat");
 
 };
 
