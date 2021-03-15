@@ -1,6 +1,6 @@
 BIN				:= serial, parallel
 
-CXX 			:= g++-10
+CXX 			:= g++
 
 CFLAGS		:= -std=c++14
 
@@ -15,7 +15,7 @@ HEADP			:= merge_par.hpp
 SRCP			:= merge_par.cpp
 
 serial:	main_s.cpp $(HEAD)
-	$(CXX) $(CFLAGS) -o $@ $(SRC) main_s.cpp
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(SRC) main_s.cpp
 
 parallel: main_p.cpp $(HEADP)
-	$(CXX) $(CFLAGS) -o $@ $(SRCP) main_p.cpp
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCP) main_p.cpp

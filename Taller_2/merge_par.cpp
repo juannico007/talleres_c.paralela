@@ -161,42 +161,63 @@ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 	}
 }
 
-// void merge_s(DinArray &v, int ini, int fin, DinArray &tmp){
-//
-//   int mid = (fin + ini) / 2;
-//
-//   if(ini < mid){
-//     merge_s(v, ini, mid, tmp); //divide
-//     merge_s(v, mid, fin, tmp); //divide
-//     merge(v, ini, fin, tmp);	  //conquer
-//   }
-// }
+void t_merge_s(DinArray &v, int ini, int fin, DinArray &tmp){
+
+  int mid = (fin + ini) / 2;
+
+  if(ini < mid){
+
+	#pragma omp task
+	{
+		t_merge_s(v, ini, mid, tmp); //divide
+	}
+
+	#pragma omp task
+	{
+		t_merge_s(v, mid, fin, tmp); //divide
+	}
+
+	#pragma omp taskwait
+    merge(v, ini, fin, tmp);	  //conquer
+  }
+}
 
 void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
-  #pragma omp parallel
-  {
-    #pragma omp simgle
-    {
-      int chunk_size = 2;
-      int str = ini;
-      while(chunk_size <= fin - ini){
-        int end = str + chunk_size;
-        #pragma omp task firstprivate(str), firstprivate(end), default(shared)
-        {
-          merge(v, str, end, tmp);
-        }
-        str += chunk_size;
-        if(str >= fin - chunk_size){
-          #pragma omp task firstprivate(str), firstprivate(end), default(shared)
-          {
-            merge(v, str, fin, tmp);
-          }
-          #pragma omp taskwait
-          chunk_size *= 2;
-          str = ini;
-        }
-      }
-    }
-  }
-  merge(v, ini, fin, tmp);
+	
+	#pragma omp parallel
+	{
+		#pragma omp single
+		{
+			t_merge_s(v, ini, fin, tmp);
+		}
+	}
 }
+
+//void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
+//  #pragma omp parallel
+//  {
+//    #pragma omp single
+//    {
+//      int chunk_size = 2;
+//      int str = ini;
+//      while(chunk_size <= fin - ini){
+//        int end = str + chunk_size;
+//        #pragma omp task firstprivate(str), firstprivate(end), default(shared)
+//        {
+//          merge(v, str, end, tmp);
+//        }
+//        str += chunk_size;
+//        if(str >= fin - chunk_size){
+//          #pragma omp task firstprivate(str), firstprivate(end), default(shared)
+//          {
+//            merge(v, str, fin, tmp);
+//          }
+//          #pragma omp taskwait
+//          chunk_size *= 2;
+//          str = ini;
+//        }
+//      }
+//    }
+//  }
+//  merge(v, ini, fin, tmp);
+//}
