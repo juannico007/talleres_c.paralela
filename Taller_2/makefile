@@ -1,6 +1,6 @@
 BIN				:= serial, parallel
 
-CXX 			:= g++
+CXX 			:= g++-10
 
 CFLAGS		:= -std=c++14
 

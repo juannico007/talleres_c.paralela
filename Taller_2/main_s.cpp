@@ -6,13 +6,13 @@ using namespace std;
 int main(int argc, char **argv){
 
 	int n = atoi(argv[1]);
-	int ntimes = atoi(argc[2]);
+	int ntimes = atoi(argv[2]);
 
 	double total_time = 0;
 
 	for (int i = 0; i < ntimes; i++){
 		DinArray arr(n);
-		
+
 		DinArray arr2(n, 4);
 		arr.write_vector();
 

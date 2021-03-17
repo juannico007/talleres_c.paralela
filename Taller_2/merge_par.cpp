@@ -1,4 +1,4 @@
-#include "merge_ser.hpp"
+#include "merge_par.hpp"
 
 /*
  * Constructor and destructor
@@ -100,7 +100,7 @@ void DinArray::write_vector(string name){
 
 	ofstream Out(name);
 	for(long i = 0; i < sz; ++i)
-		Out << p[i] << " ";
+		Out << p[i]<< " ";
 
 	Out << "\n";
 	Out.close();
@@ -121,69 +121,96 @@ void DinArray::display(){
 }
 
 /*
+	insertion sort
+*/
+
+void insertion_sort(DinArray &v, int ini, int fin){
+	for(int i = 1; i < v.size(); i++){
+    int a = i;
+    int b = i - 1;
+    while(v.get(b) > v.get(a)){
+      long c = v.get(a);
+			v.set(a, v.get(b));
+			v.set(b, c);
+      a--;
+      b = a - 1;
+    }
+  }
+}
+
+
+
+/*
  *	Merge Sort Algoritm
  */
 
-void merge(DinArray &v, int ini, int fin, DinArray &tmp){
+ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 
-	int mid = (fin + ini)/2;
-	int p1 = ini;
-	int p2 = mid;
-	int pt = ini;
+ 	int mid = (fin + ini)/2;
+ 	int p1 = ini;
+ 	int p2 = mid;
+ 	int pt = ini;
 
-	while (p1 < mid && p2 < fin){
-		if(v.get(p1) < v.get(p2)){
-		  tmp.set(pt, v.get(p1));
-		  p1++;
+ 	while (p1 < mid && p2 < fin){
+ 		if(v.get(p1) < v.get(p2)){
+ 		  tmp.set(pt, v.get(p1));
+ 		  p1++;
 
-		}else{
-		  tmp.set(pt, v.get(p2));
-		  p2++;
-		}
+ 		}else{
+ 		  tmp.set(pt, v.get(p2));
+ 		  p2++;
+ 		}
 
-		pt++;
-	}
+ 		pt++;
+ 	}
 
-	while (p1 < mid){
-		tmp.set(pt, v.get(p1));
-		pt++;
-		p1++;
-	}
+ 	while (p1 < mid){
+ 		tmp.set(pt, v.get(p1));
+ 		pt++;
+ 		p1++;
+ 	}
 
-	while (p2 < fin){
-		tmp.set(pt, v.get(p2));
-		pt++;
-		p2++;
-	}
+ 	while (p2 < fin){
+ 		tmp.set(pt, v.get(p2));
+ 		pt++;
+ 		p2++;
+ 	}
 
-	for(int i = ini; i < fin; i++){
-		v.set(i, tmp.get(i));
-	}
+ 	for(int i = ini; i < fin; i++){
+ 		v.set(i, tmp.get(i));
+ 	}
 }
 
 void t_merge_s(DinArray &v, int ini, int fin, DinArray &tmp){
 
   int mid = (fin + ini) / 2;
-
-  if(ini < mid){
-
-	#pragma omp task
-	{
-		t_merge_s(v, ini, mid, tmp); //divide
+	//printf("%d\n", mid-ini);
+	if(mid - ini < 30){
+		insertion_sort(v, ini, mid);
+		insertion_sort(v, mid, fin);
+		merge(v, ini, fin, tmp);
 	}
 
-	#pragma omp task
-	{
-		t_merge_s(v, mid, fin, tmp); //divide
+  else if (ini < mid){
+
+		#pragma omp task shared(v, tmp)
+		{
+			t_merge_s(v, ini, mid, tmp); //divide
+		}
+
+		#pragma omp task shared(v, tmp)
+		{
+			t_merge_s(v, mid, fin, tmp); //divide
+		}
+
+		#pragma omp taskwait
+	  merge(v, ini, fin, tmp);	  //conquer
 	}
 
-	#pragma omp taskwait
-    merge(v, ini, fin, tmp);	  //conquer
-  }
 }
 
 void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
-	
+
 	#pragma omp parallel
 	{
 		#pragma omp single
@@ -192,32 +219,3 @@ void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
 		}
 	}
 }
-
-//void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
-//  #pragma omp parallel
-//  {
-//    #pragma omp single
-//    {
-//      int chunk_size = 2;
-//      int str = ini;
-//      while(chunk_size <= fin - ini){
-//        int end = str + chunk_size;
-//        #pragma omp task firstprivate(str), firstprivate(end), default(shared)
-//        {
-//          merge(v, str, end, tmp);
-//        }
-//        str += chunk_size;
-//        if(str >= fin - chunk_size){
-//          #pragma omp task firstprivate(str), firstprivate(end), default(shared)
-//          {
-//            merge(v, str, fin, tmp);
-//          }
-//          #pragma omp taskwait
-//          chunk_size *= 2;
-//          str = ini;
-//        }
-//      }
-//    }
-//  }
-//  merge(v, ini, fin, tmp);
-//}

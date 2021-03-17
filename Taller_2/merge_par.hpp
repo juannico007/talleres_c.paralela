@@ -23,17 +23,16 @@ private:
 public:
 	DinArray(long size, int type = 1, string name = "vector.dat");
 	~DinArray();
-	int size() {return sz;}
+	long size() {return sz;}
 	void display();
 	long get(long pos) {return p[pos];}
 	void set(long pos, long val) {p[pos] = val;}
 	void write_vector(string name = "vector.dat");
-
 };
 
 
 void merge(DinArray &v, int ini, int fin, DinArray &tmp);
 void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp);
-
+void t_merge_s(DinArray &v, int ini, int fin, DinArray &tmp);
 
 #endif
