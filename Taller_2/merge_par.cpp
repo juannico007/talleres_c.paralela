@@ -125,10 +125,10 @@ void DinArray::display(){
 */
 
 void insertion_sort(DinArray &v, int ini, int fin){
-	for(int i = 1; i < v.size(); i++){
+	for(int i = ini + 1; i < fin; i++){
     int a = i;
     int b = i - 1;
-    while(v.get(b) > v.get(a)){
+    while(v.get(b) > v.get(a) && a >= ini){
       long c = v.get(a);
 			v.set(a, v.get(b));
 			v.set(b, c);
@@ -185,10 +185,8 @@ void t_merge_s(DinArray &v, int ini, int fin, DinArray &tmp){
 
   int mid = (fin + ini) / 2;
 	//printf("%d\n", mid-ini);
-	if(mid - ini < 30){
-		insertion_sort(v, ini, mid);
-		insertion_sort(v, mid, fin);
-		merge(v, ini, fin, tmp);
+	if(fin - ini < 100){
+		insertion_sort(v, ini, fin);
 	}
 
   else if (ini < mid){
