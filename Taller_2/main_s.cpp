@@ -13,7 +13,7 @@ int main(int argc, char **argv){
 
 	Out << "Mean time, std deviation, reps, size\n";
 
-	vector<int> sizes = {100, 100000, 10000000};
+	vector<int> sizes = {1000, 100000, 10000000};
 
 	for(int i = 0 ; i < sizes.size(); i++){
 

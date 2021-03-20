@@ -1,32 +1,45 @@
-#include <iostream>
 #include"merge_par.hpp"
+#include"helper.hpp"
+#include<iostream>
 
 using namespace std;
 
 int main(int argc, char **argv){
 
 	int n = atoi(argv[1]);
-	DinArray arr(n);
+	int ntimes = atoi(argv[2]);
 
-	// printf("Unordered vector:\n");
-	// arr.display();
+	string out_name = "results_" + to_string(n) + "_threads.csv";
+	ofstream Out(out_name);
 
-	printf("\n\n\n");
-	// arr.display();
+	Out << "Mean time, std deviation, reps, size\n";
 
-	DinArray arr2(n, 4);
-	arr.write_vector();
+	vector<int> sizes = {1000, 100000, 10000000};
 
-	double strt = omp_get_wtime();
-		merge_sort(arr, 0, arr.size(), arr2);
-	double end = omp_get_wtime();
+	for(int i = 0 ; i < sizes.size(); i++){
 
-	double tot_time = end - strt;
+		vector<double> times;
+		int n = sizes[i];
+		string name = "vector_" + to_string(n) + ".dat";
 
-	printf("time, size, speedup\n %f, %d\n", tot_time, n);
+		for (int i = 0; i < ntimes; i++){
+			DinArray arr(n, 3, name);
 
-	// printf("'ordered' vector:\n");
-	// arr.display();
+			DinArray arr2(n, 4);
 
+			double strt = omp_get_wtime();
+				merge_sort(arr, 0, arr.size(), arr2);
+			double end = omp_get_wtime();
+
+			double partial_time = end - strt;
+			times.push_back(partial_time);
+		}
+
+		Out << mean(times) << ", " << stdDeviation(times) << ", " << ntimes << ", " << n << "\n";
+		cout << "a\n";
+
+
+	}
+	Out.close();
 	return 0;
 }
