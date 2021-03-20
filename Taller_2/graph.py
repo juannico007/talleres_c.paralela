@@ -1,5 +1,4 @@
-import pandas as pd
-import os
+import testeo as t
 from math import sqrt
 import matplotlib.pyplot as plt
 
@@ -18,20 +17,23 @@ def getSpeedUps(data):
 
     #obtención del conjunto de índices del dataframe 
     #que contienen ejecuciones de un solo hilo
-    serialExec  = data[data["thr"]==1].index
-    
+    serialExec  = data[data["nthreads"]==1].index
+    print(serialExec)
     #creación de lista de listas que va a retornar 
     #los speedUps agrupados por test
     speedUps = {}
 
     for i in range(len(serialExec)):
-        sizeOfIter = data.iloc[i]["size"]             #extrae el tamaño del problema en esta iteracion
-        localSerialTimeMean = data.iloc[i]["mean"]    #extrae la media de esa iter serial
+        print(len(serialExec))
+        print(data.iloc[0])
+        sizeOfIter = data.iloc[i][" size"]             #extrae el tamaño del problema en esta iteracion
+        print(sizeOfIter)
+        localSerialTimeMean = data.iloc[i]["Mean time"]    #extrae la media de esa iter serial
         localSpeedUps = []          #lista local para ir almacenando los cálculos de speedUps
 
-        for nextItem in range(i, len(data), len(serialExec)):
+        for nextItem in range(i + len(serialExec), len(data), len(serialExec)):
             #obtención del tiempo de ejecución medio en paralelo
-            parallelExecTime = data.iloc[nextItem]["mean"]
+            parallelExecTime = data.iloc[nextItem]["Mean time"]
             #calculo del speedUp
             speedUp = localSerialTimeMean/parallelExecTime
             #guardado del speedUp en lista local 
@@ -99,12 +101,12 @@ def getThreadData(data):
     Para graficar despues
     """
     
-    data = {}          #Lista de listas con las medias de tiempo de cada hilo
+    data_dict = {}          
     
     for i in range(len(data)):
-        data[i] = data.get(i, []).append((data.iloc[i]["size"], data.iloc[i]["mean"], data.iloc[i]["std dev"]))
-        
-    return data
+        data_dict[data.iloc[i]['nthreads']] = data_dict.get(i, []).append((data.iloc[i][" size"], data.iloc[i]["Mean time"], data.iloc[i][" std deviation"]))
+
+    return data_dict
 
 def graphSpeedUpM(speedUps, stdDev, n):
     """
@@ -154,9 +156,11 @@ def graphThreadMean(data, n):
     ax1.plot(x, meanThreadP, color='b', lw=0.3)
     ax1.plot(x, meanThreadL, color='b', lw=0.3)
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-    plt.ylim([0,300])
+    plt.ylim([0,5])
     #Guarda la imagen en un archivo.jpg que esta en el pdf
     fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
+
+
 
 
 
@@ -165,31 +169,22 @@ def graphThreadMean(data, n):
 
 #Dataframe con estructura: mean, std, reps, sz, nthr
 #Ordenado por el numero de hilos
-speedUps = getSpeedUps(df)
+df = t.createDataframe()
 
-print("speedups: \n", speedUps)
+speedUpsDict = getSpeedUps(df)
+
+print(speedUpsDict)
 print()
 
-speedUpsMean = list(map(mean, speedUps))
-print("speedups mean:\n", speedUpsMean)
+speedUpsMean = means_dict(speedUpsDict)
+
+print(speedUpsMean)
 print()
 
-speedUpsStdDev = list(map(stdDeviation, speedUps))
-print("speedups standar desviation\n", speedUpsStdDev)
+speedUpsStdDev = stdDeviation_dict(speedUpsDict)
+print(speedUpsStdDev)
 print()
 
-meanThreads = getMeanThread(df, 12)
-print("Mean per thread:\n", meanThreads)
+threadsData = getThreadData(df)
+print(threadsData)
 print()
-
-stdThreads = getStdThread(df, 12)
-print("Standar desviation per thread:\n", stdThreads)
-
-
-#Grafica la media de los speedups para cada tamaño del arreglo
-for i in range(5):
-    graphSpeedUpM(speedUps, speedUpsStdDev, i)
-
-#Grafica la media de tiempo de ejecucion para cada numero de hilos
-for i in range(12):
-    graphThreadMean(meanThreads, stdThreads, i)

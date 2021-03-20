@@ -1,5 +1,5 @@
 import re
-import os 
+import os
 import pandas as pd
 
 names = os.listdir('./')
@@ -10,7 +10,7 @@ def createDataframe():
     numThreads = re.compile(r'\d+')
     files = []
 
-    for filename in names: 
+    for filename in names:
         if results_files.search(filename) != None:
             files.append(filename)
 
@@ -27,9 +27,11 @@ def createDataframe():
         computingDataTmp['nthreads'] = [nthr] * len(computingDataTmp)
         computingData = pd.concat([computingData, computingDataTmp])
 
-    computingData.sort_values(by=['nthreads'], inplace = True, ascending = True)
-    print(computingData)
+    computingData.sort_values(by=['nthreads', ' size'], inplace = True, ascending = True)
+    computingData.reset_index(inplace = True)
+    computingData.drop(["index"], axis = 1, inplace = True)
+    return computingData
 
 
 
-createDataframe()
+print(createDataframe())
