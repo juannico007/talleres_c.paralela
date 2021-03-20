@@ -120,6 +120,21 @@ void DinArray::display(){
   printf("%d]\n", p[sz - 1]);
 }
 
+
+void insertion_sort(DinArray &v, int ini, int fin){
+	for(int i = ini + 1; i < fin; i++){
+    int a = i;
+    int b = i - 1;
+    while(v.get(b) > v.get(a) && a > ini){
+      long c = v.get(a);
+			v.set(a, v.get(b));
+			v.set(b, c);
+      a--;
+      b = a - 1;
+    }
+  }
+}
+
 /*
  *	Merge Sort Algoritm
  */
@@ -155,7 +170,7 @@ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 		pt++;
 		p2++;
 	}
-	
+
 	for(int i = ini; i < fin; i++){
 		v.set(i, tmp.get(i));
 	}
@@ -164,9 +179,12 @@ void merge(DinArray &v, int ini, int fin, DinArray &tmp){
 void merge_sort(DinArray &v, int ini, int fin, DinArray &tmp){
   int mid = (fin + ini) / 2;
 
-  if(ini < mid){
+  if(fin - ini < 100){
+		insertion_sort(v, ini, fin);
+	}else if(ini < mid){
     merge_sort(v, ini, mid, tmp); //divide
     merge_sort(v, mid, fin, tmp); //divide
     merge(v, ini, fin, tmp);	  //conquer
   }
+
 }

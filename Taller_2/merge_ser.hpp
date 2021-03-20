@@ -1,5 +1,5 @@
-#ifndef _MERGE_SER_HPP
-#define _MERGE_SER_HPP
+#ifndef _SERIAL_PRUEBITA_HPP
+#define _SERIAL_PRUEBITA_HPP
 
 #include <cstdio>
 #include <random>

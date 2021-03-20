@@ -128,7 +128,7 @@ void insertion_sort(DinArray &v, int ini, int fin){
 	for(int i = ini + 1; i < fin; i++){
     int a = i;
     int b = i - 1;
-    while(v.get(b) > v.get(a) && a >= ini){
+    while(v.get(b) > v.get(a) && a > ini){
       long c = v.get(a);
 			v.set(a, v.get(b));
 			v.set(b, c);

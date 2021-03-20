@@ -1,5 +1,6 @@
-#include "omp.h"
-#include"merge_ser.hpp"
+#include <omp.h>
+//#include"merge_ser.hpp"
+#include "serial_pruebita.hpp"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ int main(int argc, char **argv){
 		double end = omp_get_wtime();
 
 		double partial_time = end - strt;
-
+		arr.display();
 		printf("time, size\n %f, %d\n", partial_time, n);
 	}
 
