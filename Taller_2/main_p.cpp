@@ -6,10 +6,16 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-	int n = atoi(argv[1]);
-	int ntimes = atoi(argv[2]);
+	int nthreads;
+	#pragma omp parallel
+	{
+		nthreads = omp_get_num_threads();
+	}
 
-	string out_name = "results_" + to_string(n) + "_threads.csv";
+	int ntimes = atoi(argv[1]);
+	cout << nthreads << "\n";
+
+	string out_name = "results_" + to_string(nthreads) + "_threads.csv";
 	ofstream Out(out_name);
 
 	Out << "Mean time, std deviation, reps, size\n";
