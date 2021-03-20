@@ -27,9 +27,20 @@ def createDataframe():
         computingDataTmp['nthreads'] = [nthr] * len(computingDataTmp)
         computingData = pd.concat([computingData, computingDataTmp])
 
-    computingData.sort_values(by=['nthreads'], inplace = True, ascending = True)
-    print(computingData)
+
+    realColumnNames = []
+    for colnames in computingData.columns:
+        realColumnNames.append(colnames.strip(' '))
+
+    computingData.columns = realColumnNames
+
+    computingData.sort_values(by=['nthreads','size'], inplace = True, ascending = True)
+
+    return computingData
 
 
 
-createDataframe()
+print(createDataframe())
+
+
+
