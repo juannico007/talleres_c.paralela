@@ -20,7 +20,7 @@ DinArray::DinArray(long size, int type, string name){
 		fill_non_rep_arr();
 	}
 	else if (type == 3){
-
+    
 		copy_vector(name);
 	}
 	else if (type == 4){

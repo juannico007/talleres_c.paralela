@@ -7,7 +7,6 @@
 
 using namespace std;
 
-double gettime();
 double mean(vector<double> data);
 double stdDeviation(vector<double> data);
 #endif
