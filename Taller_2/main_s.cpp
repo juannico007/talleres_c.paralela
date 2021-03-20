@@ -1,28 +1,44 @@
 #include"merge_ser.hpp"
 #include"helper.hpp"
+#include<iostream>
 
 using namespace std;
 
 int main(int argc, char **argv){
 
-	int n = atoi(argv[1]);
-	int ntimes = atoi(argv[2]);
-	string name = "vector_" + to_string(n) + ".dat";
+	int ntimes = atoi(argv[1]);
 
-	vector<double> times;
+	string out_name = "results_1_thread.csv";
+	ofstream Out(out_name);
 
-	for (int i = 0; i < ntimes; i++){
-		DinArray arr(n, 3, name);
+	Out << "Mean time, std deviation, reps, size\n";
 
-		DinArray arr2(n, 4);
+	vector<int> sizes = {100, 100000, 10000000};
 
-		double strt = omp_get_wtime();
-			merge_sort(arr, 0, arr.size(), arr2);
-		double end = omp_get_wtime();
+	for(int i = 0 ; i < sizes.size(); i++){
 
-		double partial_time = end - strt;
-		times.pushback(partial_time);
+		vector<double> times;
+		int n = sizes[i];
+		string name = "vector_" + to_string(n) + ".dat";
+
+		for (int i = 0; i < ntimes; i++){
+			DinArray arr(n, 3, name);
+
+			DinArray arr2(n, 4);
+
+			double strt = omp_get_wtime();
+				merge_sort(arr, 0, arr.size(), arr2);
+			double end = omp_get_wtime();
+
+			double partial_time = end - strt;
+			times.push_back(partial_time);
+		}
+
+		Out << mean(times) << ", " << stdDeviation(times) << ", " << ntimes << ", " << n << "\n";
+		cout << "a\n";
+
+
 	}
-
+	Out.close();
 	return 0;
 }

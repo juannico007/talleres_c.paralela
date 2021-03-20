@@ -6,13 +6,13 @@ CFLAGS		:= -std=c++14
 
 LDFLAGS		:= -fopenmp
 
-HEAD			:= merge_ser.hpp
+HEAD			:= merge_ser.hpp helper.hpp
 
-SRC				:= merge_ser.cpp
+SRC				:= merge_ser.cpp helper.cpp
 
-HEADP			:= merge_par.hpp
+HEADP			:= merge_par.hpp helper.hpp
 
-SRCP			:= merge_par.cpp
+SRCP			:= merge_par.cpp helper.cpp
 
 
 serial:	main_s.cpp $(HEAD)

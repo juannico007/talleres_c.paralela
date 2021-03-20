@@ -1,12 +1,11 @@
-#include"merge_par.hpp"
-#include<cstdio>
+#include<fstream>
+#include<iostream>
 
 using namespace std;
 
 int main(){
-
-  padded_long *p = new padded_long[100];
-  delete[] p;
-
-  return 0;
+  ofstream Out("a_ver_que_pdo.dat");
+	Out << "veamos";
+	Out << "\n";
+	Out.close();
 }
