@@ -17,6 +17,7 @@ top= 2cm, bottom= 2cm]{geometry}
 \usepackage{fancyhdr}
 \usepackage{animate}
 \usepackage{hyperref}
+\usepackage{float}
 \usepackage[dvipsnames]{xcolor}
 \definecolor{blueMacc}{RGB}{61, 160, 250}
 
@@ -65,10 +66,14 @@ top= 2cm, bottom= 2cm]{geometry}
         \includegraphics[width =     0.45\linewidth]{Mean of      execution time for 7         thread.png}
         \includegraphics[width = 0.45\linewidth]{Mean of execution time for 8 thread.png}
     \end{figure}
+    En el caso de arreglos de tamaño $10^3$ podemos observar que no se logra conseguir un speedup mayor a 1.4, y que a medida que el número de hilos aumenta, el speedup disminuye. Esto se debe a que el método utilizado para la paralelización del ordenamiento es tasking y al aumentar el número de hilos, el tiempo que tarda el hilo maestro en generar y asignar las tareas se vuelve mayor al tiempo que tarda el merge sort en ejecutarse sobre este tamaño del arreglo.
+    
+    Para los arreglos de tamaño $10^5$ y $10^7$ logramos observar que el número de hilos con el que obtuvo un mejor speedup fue de 11.
   
-  
+     
     \section{Resultados de promedios y desviaciones estándar por hilo}
-        \begin{figure}[ht]
+    
+    \begin{figure}[H]
     \centering
         \includegraphics[width = 0.45\linewidth]{Mean of execution time for 9 thread.png}
         \includegraphics[width = 0.45\linewidth]{Mean of execution time for 10 thread.png}
