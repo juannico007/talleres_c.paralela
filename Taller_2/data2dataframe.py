@@ -2,7 +2,8 @@ import re
 import os
 import pandas as pd
 
-names = os.listdir('./')
+names = os.listdir('.\csv_files')
+print(names)
 
 def createDataframe():
 
@@ -14,14 +15,14 @@ def createDataframe():
         if results_files.search(filename) != None:
             files.append(filename)
 
-    computingData = pd.read_csv(files[0])
+    computingData = pd.read_csv(".\csv_files\\" + files[0])
     nthr = int(numThreads.search(files[0]).group())
 
     computingData['nthreads'] = [nthr] * len(computingData)
 
     for f in files[1:]:
 
-        computingDataTmp = pd.read_csv(f)
+        computingDataTmp = pd.read_csv(".\csv_files\\" + f)
         nthr = int(numThreads.search(f).group())
 
         computingDataTmp['nthreads'] = [nthr] * len(computingDataTmp)

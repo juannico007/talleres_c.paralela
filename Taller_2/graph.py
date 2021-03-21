@@ -1,4 +1,5 @@
-import testeo as t
+import data2dataframe as d2d
+import os 
 from math import sqrt
 import matplotlib.pyplot as plt
 import math
@@ -129,7 +130,7 @@ def graphSpeedUpM(speedUps, stdDev, n):
     fig = plt.figure()
     ax1 = fig.add_subplot()
     ax1.set_ylabel('Speedup')
-    ax1.set_xlabel('Numbre of threads')
+    ax1.set_xlabel('Number of threads')
     ax1.set_title('Speedups for size {0}'.format(n))
     
     speedUpU = [i+stdDev[n] for i in y]
@@ -141,7 +142,7 @@ def graphSpeedUpM(speedUps, stdDev, n):
     ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
     
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Speedups for size {0}'.format(n))
+    fig.savefig('./results/Speedups for size {0}'.format(n))
     
 def graphThreadMean(data, n):
     """
@@ -154,8 +155,8 @@ def graphThreadMean(data, n):
     fig = plt.figure()
     ax1 = fig.add_subplot()
     ax1.set_ylabel('Mean (s)')
-    ax1.set_xlabel('Size of arrays')
-    ax1.set_title('Mean of execution time for 10^{0} thread'.format(n))
+    ax1.set_xlabel('Size of arrays 10^x')
+    ax1.set_title('Mean of execution time for {0} thread'.format(n))
     
     meanThreadP = [data[n][i][1] + data[n][i][2] for i in range(len(data[n]))]
     meanThreadL = [data[n][i][1] - data[n][i][2] for i in range(len(data[n]))]
@@ -164,9 +165,9 @@ def graphThreadMean(data, n):
     ax1.plot(x, meanThreadP, color='b', lw=0.3)
     ax1.plot(x, meanThreadL, color='b', lw=0.3)
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-    plt.ylim([0,5])
+    plt.ylim([0,3.5])
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Mean of execution time for 10^{0} thread'.format(n))
+    fig.savefig('./results/Mean of execution time for {0} thread'.format(n))
 
 
 
@@ -175,7 +176,7 @@ def graphThreadMean(data, n):
 
 #Dataframe con estructura: mean, std, reps, sz, nthr
 #Ordenado por el numero de hilos
-df = t.createDataframe()
+df = d2d.createDataframe()
 
 speedUpsDict = getSpeedUps(df)
 
@@ -194,6 +195,12 @@ print()
 threadsData = getThreadData(df)
 print(threadsData)
 print()
+
+try:
+      os.mkdir('./results')
+except: 
+    print("el directorio ./results ya existía, o hubo un error")
+
 
 for i in [1000, 100000, 10000000]:
     graphSpeedUpM(speedUpsDict, speedUpsStdDev, i)
