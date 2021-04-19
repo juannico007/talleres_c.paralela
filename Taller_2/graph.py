@@ -1,7 +1,8 @@
-import pandas as pd
-import os
+import data2dataframe as d2d
+import os 
 from math import sqrt
 import matplotlib.pyplot as plt
+import math
 
 def getSpeedUps(data):
 
@@ -18,20 +19,23 @@ def getSpeedUps(data):
 
     #obtención del conjunto de índices del dataframe 
     #que contienen ejecuciones de un solo hilo
-    serialExec  = data[data["thr"]==1].index
-    
+    serialExec  = data[data["nthreads"]==1].index
+    print(serialExec)
     #creación de lista de listas que va a retornar 
     #los speedUps agrupados por test
     speedUps = {}
 
     for i in range(len(serialExec)):
+        print(len(serialExec))
+        print(data.iloc[0])
         sizeOfIter = data.iloc[i]["size"]             #extrae el tamaño del problema en esta iteracion
-        localSerialTimeMean = data.iloc[i]["mean"]    #extrae la media de esa iter serial
+        print(sizeOfIter)
+        localSerialTimeMean = data.iloc[i]["Mean time"]    #extrae la media de esa iter serial
         localSpeedUps = []          #lista local para ir almacenando los cálculos de speedUps
 
-        for nextItem in range(i, len(data), len(serialExec)):
+        for nextItem in range(i + len(serialExec), len(data), len(serialExec)):
             #obtención del tiempo de ejecución medio en paralelo
-            parallelExecTime = data.iloc[nextItem]["mean"]
+            parallelExecTime = data.iloc[nextItem]["Mean time"]
             #calculo del speedUp
             speedUp = localSerialTimeMean/parallelExecTime
             #guardado del speedUp en lista local 
@@ -98,13 +102,18 @@ def getThreadData(data):
     retorna un diccionario de forma {numero de hilos:lista de [tamaño, media, desviacion estandar]}
     Para graficar despues
     """
+    num_threads = data.drop_duplicates(['nthreads'])
+    num_threads = list(num_threads['nthreads'])
     
-    data = {}          #Lista de listas con las medias de tiempo de cada hilo
+    data_dict = {i : [] for i in num_threads}          
     
     for i in range(len(data)):
-        data[i] = data.get(i, []).append((data.iloc[i]["size"], data.iloc[i]["mean"], data.iloc[i]["std dev"]))
+        l = data_dict.get(data.iloc[i]['nthreads'])
+        sizeMeanStdDev = (data.iloc[i]["size"], data.iloc[i]["Mean time"], data.iloc[i]["std deviation"])
+        l.append(sizeMeanStdDev)
+        data_dict[data.iloc[i]['nthreads']] = l
         
-    return data
+    return data_dict
 
 def graphSpeedUpM(speedUps, stdDev, n):
     """
@@ -114,13 +123,15 @@ def graphSpeedUpM(speedUps, stdDev, n):
     """
     
     y = [i for i in speedUps[n]]
-    x = [i for i in range(2,13)]
+    x = [i for i in range(2,17)]
+    print(x)
+    print(y)
     
     fig = plt.figure()
     ax1 = fig.add_subplot()
     ax1.set_ylabel('Speedup')
-    ax1.set_xlabel('Numbre of threads')
-    ax1.set_title('Speedups for size 10^{0}'.format(n))
+    ax1.set_xlabel('Number of threads')
+    ax1.set_title('Speedups for size {0}'.format(n))
     
     speedUpU = [i+stdDev[n] for i in y]
     speedUpL = [i-stdDev[n] for i in y]
@@ -131,7 +142,7 @@ def graphSpeedUpM(speedUps, stdDev, n):
     ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
     
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Speedups for size 10^{0}'.format(n))
+    fig.savefig('./results/Speedups for size {0}'.format(n))
     
 def graphThreadMean(data, n):
     """
@@ -139,13 +150,13 @@ def graphThreadMean(data, n):
     Grafica la media de tiempo de ejecucion para varios tamaños del problema
     Recibe el diccionario de datos y el numero de hilos a graficar
     """
-    x = [data[n][i][0] for i in range(len(data[n]))]
+    x = [math.log10(data[n][i][0]) for i in range(len(data[n]))]
     y = [data[n][i][1] for i in range(len(data[n]))]
     fig = plt.figure()
     ax1 = fig.add_subplot()
     ax1.set_ylabel('Mean (s)')
-    ax1.set_xlabel('Size of arrays (10^x)')
-    ax1.set_title('Mean of execution time for {0} thread'.format(n + 1))
+    ax1.set_xlabel('Size of arrays 10^x')
+    ax1.set_title('Mean of execution time for {0} thread'.format(n))
     
     meanThreadP = [data[n][i][1] + data[n][i][2] for i in range(len(data[n]))]
     meanThreadL = [data[n][i][1] - data[n][i][2] for i in range(len(data[n]))]
@@ -154,9 +165,9 @@ def graphThreadMean(data, n):
     ax1.plot(x, meanThreadP, color='b', lw=0.3)
     ax1.plot(x, meanThreadL, color='b', lw=0.3)
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
-    plt.ylim([0,300])
+    plt.ylim([0,3.5])
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
+    fig.savefig('./results/Mean of execution time for {0} thread'.format(n))
 
 
 
@@ -165,31 +176,38 @@ def graphThreadMean(data, n):
 
 #Dataframe con estructura: mean, std, reps, sz, nthr
 #Ordenado por el numero de hilos
-speedUps = getSpeedUps(df)
+df = d2d.createDataframe()
 
-print("speedups: \n", speedUps)
+speedUpsDict = getSpeedUps(df)
+
+print(speedUpsDict)
 print()
 
-speedUpsMean = list(map(mean, speedUps))
-print("speedups mean:\n", speedUpsMean)
+speedUpsMean = means_dict(speedUpsDict)
+
+print(speedUpsMean)
 print()
 
-speedUpsStdDev = list(map(stdDeviation, speedUps))
-print("speedups standar desviation\n", speedUpsStdDev)
+speedUpsStdDev = stdDeviation_dict(speedUpsDict)
+print(speedUpsStdDev)
 print()
 
-meanThreads = getMeanThread(df, 12)
-print("Mean per thread:\n", meanThreads)
+threadsData = getThreadData(df)
+print(threadsData)
 print()
 
-stdThreads = getStdThread(df, 12)
-print("Standar desviation per thread:\n", stdThreads)
+try:
+      os.mkdir('./results')
+except: 
+    print("el directorio ./results ya existía, o hubo un error")
 
 
-#Grafica la media de los speedups para cada tamaño del arreglo
-for i in range(5):
-    graphSpeedUpM(speedUps, speedUpsStdDev, i)
+for i in [1000, 100000, 10000000]:
+    graphSpeedUpM(speedUpsDict, speedUpsStdDev, i)
 
-#Grafica la media de tiempo de ejecucion para cada numero de hilos
-for i in range(12):
-    graphThreadMean(meanThreads, stdThreads, i)
+for i in range(1, 17):
+    graphThreadMean(threadsData, i)
+
+
+
+
