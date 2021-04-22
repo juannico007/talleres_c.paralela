@@ -1,5 +1,5 @@
 #include <sys/time.h>
-//#include <mpi.h>
+#include <mpi.h>
 #include "pgmio.hpp"
 #include <cstdio>
 
@@ -78,16 +78,39 @@ int main(int argc, char** argv){
 	/*
 *		Begin of parallel region
 */
-
+	//Start parallel region and set mpi variables
 	MPI_Init(&argc, &argv);
-	MPI_COMM comm = MPI_COMM_WORLD;
+	MPI_Comm comm = MPI_COMM_WORLD;
 	int rank, size;
-	
-
 	MPI_Comm_rank(comm, &rank);
 	MPI_Comm_size(comm, &size);
 
-	//MPI_Scatter()
+	int n_rows = (m+2)/size;
+	int chunk_size = n_rows*(n+2);
+	//Initialize receivers for each process, we need a couple of extra columns to comunicate an update correctly every value of the matrix
+	float* local_edge = new float[chunk_size + (n+2)*2];
+	float* local_new_b = new float[chunk_size + (n+2)*2];
+	float* local_old_b = new float[chunk_size + (n+2)*2];
+	
+
+	MPI_Scatter(edge, chunk_size, MPI_FLOAT, &local_edge[n+2], chunk_size, MPI_FLOAT, 0, comm);
+	MPI_Scatter(new_b, chunk_size, MPI_FLOAT, &local_new_b[n+2], chunk_size, MPI_FLOAT, 1, comm);
+	MPI_Scatter(old_b, chunk_size, MPI_FLOAT, &local_old_b[n+2], chunk_size, MPI_FLOAT, 2, comm);
+	
+	printf("Im process number %d of %d and I received from %d to %d ", rank, size, rank*chunk_size, (rank + 1)*chunk_size);
+	int c, i, end;
+	if(rank == 0){
+		i = 0;
+		end = chunk_size;
+	}else{
+		i = 1;
+		end = chunk_size + 1;
+	}
+	for(i; i < end; i++){
+		c += (local_edge[n + 2 + i] == edge[rank * (n + 2) + i]);
+	}
+	printf(chunk_size == c ? "correctly copied\n": "there was an error\n");
+	
 
 //
 //	double tstart = gettime();
@@ -128,13 +151,21 @@ int main(int argc, char** argv){
 //	//write image 
 //	pgmwrite(filename2, buff, m, n);
 //
-//	//free edge, old_b and new_b
-//	delete[] edge;
-//	delete[] old_b;
-//	delete[] new_b;
-//	//free buffer
-//	delete[] buff;
-//
+
+	//free local arrays	
+	delete[] local_old_b;
+	delete[] local_new_b;
+	delete[] local_edge;
+	//end parallel region
+	MPI_Finalize();
+
+	//free edge, old_b and new_b
+	delete[] edge;
+	delete[] old_b;
+	delete[] new_b;
+	//free buffer
+	delete[] buff;
+	
 	return 0;
 }
 
