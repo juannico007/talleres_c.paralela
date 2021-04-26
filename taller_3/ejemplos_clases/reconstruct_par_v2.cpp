@@ -14,7 +14,7 @@ double gettime(){
 void update_img(float& img, float& new_img, int rank, int chunksz){
 
 	for(int i = 1; i < chunksz-1; i++){
-		new_img
+		new_img;
 	}
 
 }
@@ -47,39 +47,35 @@ int main(int argc, char** argv){
 	cout << "m: " << m << " n: " << n << endl;
 	float* buff = new float[m*n];
 
-	//allocate array to store the buffer + halo
-	//allocate array old_b
-	//allocate array new_b
 	/*
 		m = number of lines
 		n = number of columns
 		Keep in mind that we need an extra border (n+2 and m+2)
 	*/
 
-	float* edge = new float[(m+2)*(n+2)];
-
-	//set halos to 255
-	for(int j = 0; j < n+2; j++){
-		edge[0*(n+2)+j] = 255;			//Set upper edge
-	   	edge[(m+1)*(n+2)+j] = 255;		//Set lower edge
-	}
-
-	for(int i = 1; i < m+1; i++){
-		edge[i*(n+2)+0] = 255;			//Set left edge
-		edge[i*(n+2)+(n+1)] = 255;		//Set right edge
-	}
+//	float* edge = new float[(m+2)*(n+2)];
+//
+//	//set halos to 255
+//	for(int j = 0; j < n+2; j++){
+//		edge[0*(n+2)+j] = 255;			//Set upper edge
+//	   	edge[(m+1)*(n+2)+j] = 255;		//Set lower edge
+//	}
+//
+//	for(int i = 1; i < m+1; i++){
+//		edge[i*(n+2)+0] = 255;			//Set left edge
+//		edge[i*(n+2)+(n+1)] = 255;		//Set right edge
+//	}
 
 	//read image to buff
 	pgmread(filename, buff, m, n);
 
-	//copy buff to edge
 	for(int i = 0; i < m; i++){
 		for(int j = 0; j < n; j++){
-		  edge[(i+1)*(n+2)+(j+1)] = buff[i*n+j]; 
+		  printf(" %.0f", buff[i*n+j]); 
 		}
+		printf("\n");
 	}
-
-
+	
 
 	/*
 	*		Begin of parallel region
@@ -92,36 +88,72 @@ int main(int argc, char** argv){
 	MPI_Comm_rank(comm, &rank);
 	MPI_Comm_size(comm, &size);
 
-	int n_rows = (m+2)/size;
-	int chunk_size = n_rows*(n+2);
-	
+	int n_rows = m/size;
+	int chunk_size = n_rows*n;
+	int chunk_size_halo = (n_rows+2)*(n+2);
 	//Initialize receivers for each process, we need a couple of extra columns to comunicate an update correctly every value of the matrix
-	float* local_edge = new float[chunk_size + (n+2)*2];
-	float* local_new_b = new float[chunk_size + (n+2)*2];
-	float* local_old_b = new float[chunk_size + (n+2)*2];
+	float* local_edge = new float[chunk_size];
+	float* new_b = new float[chunk_size_halo];
+	float* old_b = new float[chunk_size_halo];
 	
 
-	MPI_Scatter(edge, chunk_size, MPI_FLOAT, &local_edge[n+2], chunk_size, MPI_FLOAT, 0, comm);
-	
-	printf("Im process number %d of %d and I received from %d to %d ", rank, size, rank*chunk_size, (rank + 1)*chunk_size);
-	int c, i, end;
+	MPI_Scatter(buff, chunk_size, MPI_FLOAT, local_edge, chunk_size, MPI_FLOAT, 0, comm);
 
-	if(rank == 0){
-		i = 0;
-		end = chunk_size;
-	}else{
-		i = 1;
-		end = chunk_size + 1;
-	}
 
-	for(i; i < end; i++){
-		c += (local_edge[n + 2 + i] == edge[rank * (n + 2) + i]);
-	}
-
-	printf(chunk_size == c ? "correctly copied\n": "there was an error\n");
-	
-
+/*
+ *	verify scatter of buffer
+ */	
+//	printf("Im process number %d of %d and I received from %d to %d, I recieved \n ", rank, size, rank*chunk_size, (rank + 1)*chunk_size);`
+//	
+//	for(int i = 0; i < n_rows; i++){
+//		for(int j = 0; j < n; j++){
+//			printf(" %d: %.0f", rank*chunk_size + i*n + j, local_edge[i*n + j]);
+//		}
+//		printf("\n");
+//	}
+//	printf("\n\n");
 //
+//
+	
+	//Set white halos of old_b and new_b
+	if(rank == 0){
+		for(int i = 0; i < n + 2; i++){			//Set upper edge
+			new_b[i] = 255;
+			old_b[i] = 255;	
+		}
+	}else if(rank == size - 1){					//Set lower edge
+		for(int i = 0; i < n + 2; i++){
+			new_b[(n+2)*(n_rows+1) + i] = 255;
+			old_b[(n+2)*(n_rows+1) + i] = 255;
+		}
+	}
+
+
+
+
+	for(int i = 0; i < n_rows+1; i++){
+		new_b[i*(n+2)+0] = 255;					//Set left edge
+		old_b[i*(n+2)+0] = 255;
+		new_b[i*(n+2)+(n+1)] = 255;				//Set right edge
+		old_b[i*(n+2)+(n+1)] = 255;				
+	}
+
+	for(int i = 0; i < n_rows; i++){
+		for(int j = 0; j < n; j++){
+		  old_b[(i+1)*(n+2)+(j+1)] = local_edge[i*n+j]; 
+		}
+	}
+
+	for(int i = 0; i < n_rows+2; i++){
+		for(int j = 0; j < n+2; j++){
+			printf(" %d: %.0f", rank, old_b[i*n + j]);
+		}
+		printf("\n");
+	}
+	printf("\n\n");
+
+
+
 //	double tstart = gettime();
 //
 //	//Loop over iterations-------------------------------------
@@ -162,14 +194,14 @@ int main(int argc, char** argv){
 //
 
 	//free local arrays	
-	delete[] local_old_b;
-	delete[] local_new_b;
+	delete[] old_b;
+	delete[] new_b;
 	delete[] local_edge;
 	//end parallel region
 	MPI_Finalize();
 
 	//free edge, old_b and new_b
-	delete[] edge;
+	//delete[] edge;
 	
 	//free buffer
 	delete[] buff;
