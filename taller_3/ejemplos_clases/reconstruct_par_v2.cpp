@@ -237,8 +237,9 @@ int main(int argc, char** argv){
 	MPI_Gather(local_edge, chunk_size, MPI_FLOAT, buff, chunk_size, MPI_FLOAT, 0, comm); 
 
 	//write image 
-//	pgmwrite(filename2, buff, m, n);
-
+	if(rank==0){
+	pgmwrite(filename2, buff, m, n);
+	}
 
 	//free local arrays	
 	delete[] old_b;
@@ -246,9 +247,7 @@ int main(int argc, char** argv){
 	delete[] local_edge;
 	//end parallel region
 	MPI_Finalize();
-
-	pgmwrite(filename2, buff, m, n);	
-
+	
 	//free edge, old_b and new_b
 	//delete[] edge;
 	
