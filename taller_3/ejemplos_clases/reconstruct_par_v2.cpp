@@ -13,7 +13,6 @@ using namespace std;
 int main(int argc, char** argv){
 
 	string filename;		//string to save filename to be read
-
 	filename.assign(argv[1]);
 	string filename2(argv[1]);
 	
@@ -59,7 +58,7 @@ int main(int argc, char** argv){
 	/* 
  	 * print the matrix of the pgm image
 	 */
-
+//
 //	for(int i = 0; i < m; i++){
 //		for(int j = 0; j < n; j++){
 //		  printf(" %.0f", buff[i*n+j]); 
@@ -132,6 +131,23 @@ int main(int argc, char** argv){
 			new_b[i*(n+2)+(n+1)] = 255;				//Set right edge
 			old_b[i*(n+2)+(n+1)] = 255;				
 		}
+	}
+/*
+ *	print for debug
+ *
+ */
+
+//	for(int i = 0; i < n_rows+2; i++){
+//		for(int j = 0; j < n+2; j++){
+//			printf(" %d: %.0f", rank, old_b[i*(n+2) + j]);
+//		}
+//		printf("\n");
+//	}
+//	printf("\n\n");
+//
+//	MPI_Barrier(comm);
+//	printf("**********************************************************************************\n");
+
 
 		for(int i = 0; i < n_rows; i++){
 			for(int j = 0; j < n; j++){
@@ -192,6 +208,35 @@ int main(int argc, char** argv){
 			for(int i = 1; i < n_rows+1; i++){
 				for(int j = 1; j < n+1; j++){
 					old_b[i*(n+2)+j] = new_b[i*(n+2)+j];
+
+	//Loop over iterations-------------------------------------
+	
+	for(int it = 0; it < N; it++){
+		//Set communication between processes to share last ando first partition row
+		
+		if(rank == 0){
+			MPI_Send(&old_b[(n+2)*n_rows], n+2, MPI_FLOAT, next_p, 1, comm);
+			MPI_Recv(&old_b[(n+2)*(n_rows+1)], n+2, MPI_FLOAT, next_p, 0, comm, MPI_STATUS_IGNORE);
+		}else if(rank == size - 1){
+			MPI_Send(&old_b[(n+2)*1], n+2, MPI_FLOAT, past_p, 0, comm);	
+			MPI_Recv(&old_b[(n+2)*0], n+2, MPI_FLOAT, past_p, 1, comm, MPI_STATUS_IGNORE);
+		}else{
+			//Send and receive from past process
+			MPI_Send(&old_b[(n+2)*1], n+2, MPI_FLOAT, past_p, 0, comm);	
+			MPI_Recv(&old_b[(n+2)*0], n+2, MPI_FLOAT, past_p, 1, comm, MPI_STATUS_IGNORE);
+			//Send and receive from next process
+			MPI_Send(&old_b[(n+2)*n_rows], n+2, MPI_FLOAT, next_p, 1, comm);
+			MPI_Recv(&old_b[(n+2)*(n_rows+1)], n+2, MPI_FLOAT, next_p, 0, comm, MPI_STATUS_IGNORE);
+		}
+		printf("info received\n");
+		//get new values (do not update the halo)
+		for(int i = 1; i < n_rows+1; i++){
+			for(int j = 1; j < n+1; j++){
+				new_b[i*(n+2)+j] = (old_b[i*(n+2)+(j-1)]+
+				old_b[i*(n+2)+(j+1)]+
+				old_b[(i-1)*(n+2)+j]+
+				old_b[(i+1)*(n+2)+j]-
+				local_edge[(i-1)*n+(j-1)]) / 4;
 				}
 			}
 		}
@@ -217,6 +262,10 @@ int main(int argc, char** argv){
 			  local_edge[i*n+j] = old_b[(i+1)*(n+2)+(j+1)];  
 			}
 		}
+
+	printf("iteration number %d\n",it);
+	}
+	//---------------------------------------------------------
 
 	//	for(int i = 0; i < n_rows; i++){
 	//		for(int j = 0; j < n; j++){
