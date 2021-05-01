@@ -19,7 +19,7 @@ def getSpeedUps(data):
 
     #obtención del conjunto de índices del dataframe 
     #que contienen ejecuciones de un solo hilo
-    serialExec  = data[data["nthreads"]==1].index
+    serialExec  = data[data["nprocesses"]==1].index
     print(serialExec)
     #creación de lista de listas que va a retornar 
     #los speedUps agrupados por test
@@ -102,16 +102,16 @@ def getThreadData(data):
     retorna un diccionario de forma {numero de hilos:lista de [tamaño, media, desviacion estandar]}
     Para graficar despues
     """
-    num_threads = data.drop_duplicates(['nthreads'])
-    num_threads = list(num_threads['nthreads'])
+    num_threads = data.drop_duplicates(['nprocesses'])
+    num_threads = list(num_threads['nprocesses'])
     
     data_dict = {i : [] for i in num_threads}          
     
     for i in range(len(data)):
-        l = data_dict.get(data.iloc[i]['nthreads'])
+        l = data_dict.get(data.iloc[i]['nprocesses'])
         sizeMeanStdDev = (data.iloc[i]["size"], data.iloc[i]["Mean time"], data.iloc[i]["std deviation"])
         l.append(sizeMeanStdDev)
-        data_dict[data.iloc[i]['nthreads']] = l
+        data_dict[data.iloc[i]['nprocesses']] = l
         
     return data_dict
 
