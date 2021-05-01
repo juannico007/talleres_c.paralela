@@ -20,8 +20,10 @@ int main(int argc, char** argv){
 	for(int i = 0; i < 4; i++){
 		filename2.pop_back();
 	}
-
-	filename2 += "_re.pgm";
+	
+	int nprocesses = atoi(argv[2]);
+	filename2 += "_";
+	filename2 += to_string(nprocesses);
 
 	if(argc == 4){
 		filename2 = argv[3];
@@ -30,8 +32,7 @@ int main(int argc, char** argv){
 	printf("%s, %s, %d\n", filename.c_str(), filename2.c_str(), sizeof(argv[1]));
 
 	//get the current number of processes that was passed as an argument to the function
-	int nprocesses = atoi(argv[2]);
-	string out_name = "results_" + filename + "_" + to_string(n_processes) + ".csv";
+	string out_name = "results_" + filename + "_" + to_string(nprocesses) + ".csv";
 
 	//stream to save the results in a csv file
 	ofstream Out(out_name);
@@ -70,18 +71,19 @@ int main(int argc, char** argv){
 	vector<double> exec_times(5,0);
 	int count = 0;
 
+	MPI_Init(&argc, &argv);
+	MPI_Comm comm = MPI_COMM_WORLD;
+
+	int rank, size;
+	MPI_Comm_rank(comm, &rank);
+	MPI_Comm_size(comm, &size);
+
 	for(auto c: ntimes){
 		
 		/*
 		*		Begin of parallel region
 		*/
 		//Start parallel region and set mpi variables
-		MPI_Init(&argc, &argv);
-		MPI_Comm comm = MPI_COMM_WORLD;
-
-		int rank, size;
-		MPI_Comm_rank(comm, &rank);
-		MPI_Comm_size(comm, &size);
 
 		int n_rows = m/size;
 		int chunk_size = n_rows*n;
@@ -131,7 +133,6 @@ int main(int argc, char** argv){
 			new_b[i*(n+2)+(n+1)] = 255;				//Set right edge
 			old_b[i*(n+2)+(n+1)] = 255;				
 		}
-	}
 /*
  *	print for debug
  *
@@ -208,42 +209,11 @@ int main(int argc, char** argv){
 			for(int i = 1; i < n_rows+1; i++){
 				for(int j = 1; j < n+1; j++){
 					old_b[i*(n+2)+j] = new_b[i*(n+2)+j];
-
-	//Loop over iterations-------------------------------------
-	
-	for(int it = 0; it < N; it++){
-		//Set communication between processes to share last ando first partition row
-		
-		if(rank == 0){
-			MPI_Send(&old_b[(n+2)*n_rows], n+2, MPI_FLOAT, next_p, 1, comm);
-			MPI_Recv(&old_b[(n+2)*(n_rows+1)], n+2, MPI_FLOAT, next_p, 0, comm, MPI_STATUS_IGNORE);
-		}else if(rank == size - 1){
-			MPI_Send(&old_b[(n+2)*1], n+2, MPI_FLOAT, past_p, 0, comm);	
-			MPI_Recv(&old_b[(n+2)*0], n+2, MPI_FLOAT, past_p, 1, comm, MPI_STATUS_IGNORE);
-		}else{
-			//Send and receive from past process
-			MPI_Send(&old_b[(n+2)*1], n+2, MPI_FLOAT, past_p, 0, comm);	
-			MPI_Recv(&old_b[(n+2)*0], n+2, MPI_FLOAT, past_p, 1, comm, MPI_STATUS_IGNORE);
-			//Send and receive from next process
-			MPI_Send(&old_b[(n+2)*n_rows], n+2, MPI_FLOAT, next_p, 1, comm);
-			MPI_Recv(&old_b[(n+2)*(n_rows+1)], n+2, MPI_FLOAT, next_p, 0, comm, MPI_STATUS_IGNORE);
-		}
-		printf("info received\n");
-		//get new values (do not update the halo)
-		for(int i = 1; i < n_rows+1; i++){
-			for(int j = 1; j < n+1; j++){
-				new_b[i*(n+2)+j] = (old_b[i*(n+2)+(j-1)]+
-				old_b[i*(n+2)+(j+1)]+
-				old_b[(i-1)*(n+2)+j]+
-				old_b[(i+1)*(n+2)+j]-
-				local_edge[(i-1)*n+(j-1)]) / 4;
 				}
 			}
+
+			printf("iteration number %d\n",it);
 		}
-		
-		//---------------------------------------------------------
-
-
 	/*
 	 *	Print for debug
 	 */
@@ -263,8 +233,7 @@ int main(int argc, char** argv){
 			}
 		}
 
-	printf("iteration number %d\n",it);
-	}
+	
 	//---------------------------------------------------------
 
 	//	for(int i = 0; i < n_rows; i++){
@@ -283,7 +252,17 @@ int main(int argc, char** argv){
 
 		//write image 
 		if(rank==0){
-		pgmwrite(filename2, buff, m, n);
+			exec_times[count] = t_end - t_start;
+			
+			string local_filename = filename2;
+
+			local_filename += "_niters_";
+			local_filename += to_string(c);
+			local_filename += "_re.pgm";
+
+			pgmwrite(local_filename, buff, m, n);
+			Out << mean(exec_times) << "," << stdDeviation(exec_times) << "," << c << "," << n*m << "\n";
+			cout << "a\n";
 		}
 
 		//free local arrays	
@@ -291,16 +270,14 @@ int main(int argc, char** argv){
 		delete[] new_b;
 		delete[] local_edge;
 		//end parallel region
-		MPI_Finalize();
 		
 		//free edge, old_b and new_b
 		//delete[] edge;
 
-		exec_times[count] = t_end - t_start;
+
 	}	
 
-	Out << mean(times) << "," << stdDeviation(times) << "," << ntimes << "," << n*m << "\n";
-	cout << "a\n";
+	MPI_Finalize();
 
 
 	//free buffer
