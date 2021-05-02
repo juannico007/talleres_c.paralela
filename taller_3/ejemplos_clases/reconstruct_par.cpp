@@ -5,24 +5,6 @@
 
 using namespace std;
 
-double gettime(){
-	struct timeval tp;
-	gettimeofday (&tp, NULL);
-	return tp.tv_sec + tp.tv_usec/(double)1.0e6;
-}
-
-void update_img(float& img, float& new_img, int rank, int chunksz){
-
-	for(int i = 1; i < chunksz-1; i++){
-		new_img;
-	}
-
-}
-
-
-
-
-
 int main(int argc, char** argv){
 	string filename;
 	filename.assign(argv[1]);
@@ -32,19 +14,17 @@ int main(int argc, char** argv){
 		filename2.pop_back();
 	}
 
-	filename2 += "_re.pgm";
 	int N = atoi(argv[2]);
 
-	if(argc == 4){
-		filename2 = argv[3];
-	}
-	printf("%s, %s, %d\n", filename.c_str(), filename2.c_str(), sizeof(argv[1]));
+	int nproc = atoi(argv[3]);
+	filename2 += "_re_" + to_string(nproc) + "_" + to_string(N) + ".pgm";
+	//printf("%s, %s, %d\n", filename.c_str(), filename2.c_str(), sizeof(argv[1]));
 
 	//allocate buffer
 	int m, n;
 	pgmsize(filename, m, n);
 
-	cout << "m: " << m << " n: " << n << endl;
+	//cout << "m: " << m << " n: " << n << endl;
 	float* buff = new float[m*n];
 
 	/*
@@ -100,7 +80,7 @@ int main(int argc, char** argv){
 	float* new_b = new float[chunk_size_halo];
 	float* old_b = new float[chunk_size_halo];
 
-
+	double tstart = MPI_Wtime();
 	MPI_Scatter(buff, chunk_size, MPI_FLOAT, local_edge, chunk_size, MPI_FLOAT, 0, comm);
 
 
@@ -164,7 +144,6 @@ int main(int argc, char** argv){
 	int next_p = rank + 1;
 	int past_p = rank - 1;
 
-	double tstart = gettime();
 
 	//Loop over iterations-------------------------------------
 
@@ -204,8 +183,6 @@ int main(int argc, char** argv){
 	}
 	//---------------------------------------------------------
 
-	double tstop = gettime();
-
 /*
  *	Print for debug
  */
@@ -236,6 +213,8 @@ int main(int argc, char** argv){
 
 	MPI_Gather(local_edge, chunk_size, MPI_FLOAT, buff, chunk_size, MPI_FLOAT, 0, comm);
 
+	double tstop = MPI_Wtime();
+	cout << tstop-tstart << "," << N << "," << m*n << "," << nproc <<  endl;
 	//write image
 	if(rank==0){
 	pgmwrite(filename2, buff, m, n);
