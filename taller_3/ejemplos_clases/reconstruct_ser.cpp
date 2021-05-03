@@ -8,16 +8,23 @@ double gettime(){
 }
 
 int main(int argc, char** argv){
-	string filename = "edge192x128.pgm";
-	string filename2 = "edge192x128_re.pgm";
 
-	int N = atoi(argv[1]);
+	string filename = "";
+	filename.assign(argv[1]);
+	string filename2(argv[1]);
+
+	for(int i = 0; i < 4; i++){
+		filename2.pop_back();
+	}
+
+	int N = atoi(argv[2]);
+
+	filename2 += "re_1_" + to_string(N) + ".pgm";
 
 	//allocate buffer
 	int m, n;
 	pgmsize(filename, m, n);
 
-	cout << "m: " << m << " n: " << n << endl;
 	float* buff = new float[m*n];
 
 	//allocate array to store the buffer + halo
@@ -84,7 +91,7 @@ int main(int argc, char** argv){
 
 	double tstop = gettime();
 
-	printf("\nTime taken was  %f seconds\n", tstop-tstart);
+	printf("%f,%d,%d,1\n", tstop-tstart, N, n*m);
 
 	//copy old_b back to buff
 	for(int i = 1; i < m+1; i++){

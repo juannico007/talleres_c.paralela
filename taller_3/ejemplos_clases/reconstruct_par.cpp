@@ -214,10 +214,10 @@ int main(int argc, char** argv){
 	MPI_Gather(local_edge, chunk_size, MPI_FLOAT, buff, chunk_size, MPI_FLOAT, 0, comm);
 
 	double tstop = MPI_Wtime();
-	cout << tstop-tstart << "," << N << "," << m*n << "," << nproc <<  endl;
 	//write image
 	if(rank==0){
-	pgmwrite(filename2, buff, m, n);
+		cout << tstop-tstart << "," << N << "," << m*n << "," << nproc <<  endl;
+		pgmwrite(filename2, buff, m, n);
 	}
 
 	//free local arrays

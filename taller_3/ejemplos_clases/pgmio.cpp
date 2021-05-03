@@ -88,8 +88,8 @@ void pgmwrite(string filename, float *vx, int m, int n){
     exit(-1);
   }
   
-  cout << "Writing " << n << " x "<< m << " picture into file: "
-       << filename << "\n";
+  //cout << "Writing " << n << " x "<< m << " picture into file: "
+   //    << filename << "\n";
 
   /*
    *  Find the max and min absolute values of the array
