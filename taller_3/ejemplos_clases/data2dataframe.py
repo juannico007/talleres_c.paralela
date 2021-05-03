@@ -17,6 +17,7 @@ def createDataframe():
 
     computingData['nprocesses'] = [int(nprocesses[0])] * len(computingData)
     for f, i in zip(names[1:],range(1,len(names))):
+        print(f)
         computingDataTmp = pd.read_csv("./csv_results/" + f) 
 
         computingDataTmp['nprocesses'] = [int(nprocesses[i])] * len(computingDataTmp)

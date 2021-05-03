@@ -6,16 +6,16 @@ import os
 csvs = os.listdir(".")[1:]
 csvs.remove("resultados_pasados")       #borrado de carpeta innecesaria de la lista
 csvs.remove("processed_results.csv")    #borrado del archivo de salida de la lista
-
+csvs.remove("process_raw_data.py")    #borrado del archivo de salida de la lista
 print(csvs)
 
 df = pd.read_csv(csvs[0], header=None)  #lectura del dataframe inicial
-print(df.head())
+#print(df.head())
 
 #lectura de los demás dataframes y concatenado de estos
 
 for csv in csvs[1:]:
-    
+
     dflocal = pd.read_csv(csv, header=None)
     #print(df.head())
 
@@ -24,8 +24,12 @@ for csv in csvs[1:]:
 #renombrado de las columnas por comodidad
 df.rename(columns = {0: "time",1: "nreps", 2:"size", 3:"nproc"}, inplace = True)
 
+df['size'] *= df["nreps"]
+print(df.head())
+df.drop(["nreps"], axis=1, inplace=True)
+
 #se hace el agrupado de los datos en el dataframe
-groups = df.groupby(["size", "nreps", "nproc"])
+groups = df.groupby(["size", "nproc"])
 
 
 #almacena todos los datos que se van a meter al dataframe
@@ -37,20 +41,16 @@ for groupname, frame in groups:
     print(groupname)
     localdata.append(frame["time"].mean())
     localdata.append(frame["time"].std())
-    localdata.append(groupname[1])
     localdata.append(groupname[0])
-    localdata.append(groupname[2])
-    
+    localdata.append(groupname[1])
+
     input_data.append(localdata)
 
 
 #dataframe para guardar los resultados finales
-processed_data = pd.DataFrame(input_data, columns = ["Mean time", "std deviation", "reps", "size", "nprocesses"])
-processed_data.sort_values(by=["reps", "size"], ascending=True)
+processed_data = pd.DataFrame(input_data, columns = ["Mean time", "std deviation", "size", "nprocesses"])
+processed_data.sort_values(by=["nprocesses", "size"], inplace=True, ascending=True)
 
 
 print(df.head())
 processed_data.to_csv("processed_results.csv", index=False)
-
-
-

@@ -1,18 +1,18 @@
 BIN				:= serial, parallel
 
-CXX 			:= mpic++
-
+CXX 			:= g++
+CXXP			:= mpic++
 CFLAGS		:= 
 
 LDFLAGS		:= 
 
-HEAD			:= pgmio.hpp helper.hpp
+HEAD			:= pgmio.hpp
 
-SRC				:= pgmio.cpp helper.cpp
+SRC				:= pgmio.cpp 
 
 serial:	reconstruct_ser.cpp $(HEAD)
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(SRC) reconstruct_ser.cpp
+	$(CXX) $(CFLAGS) -o $@ $(SRC) reconstruct_ser.cpp
 
-parallel: reconstruct_par_v2.cpp $(HEADP)
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCP) reconstruct_par_v2.cpp
+parallel: reconstruct_par.cpp $(HEAD)
+	$(CXXP) $(CFLAGS) -o $@ $(SRC) reconstruct_par.cpp
 
