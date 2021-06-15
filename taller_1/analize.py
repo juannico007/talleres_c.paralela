@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from math import sqrt
 import matplotlib.pyplot as plt
@@ -91,6 +92,22 @@ def getStdThread(data, nthreads):
         
     return devs
 
+def createNeededFolders():
+
+    """
+    Crea las carpetas necesarias para guardad las imágenes y archivos
+    """
+    cwd = os.getcwd()
+    folder_name = "Plots"
+
+    path = os.path.join(cwd, folder_name)
+
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+   
+
+
 def graphSpeedUpM(speedUps, stdDev, n):
     #Funcion que dada una lista de listas de speedUps para cada tamaño de arreglo 
     #grafica la media de speedups para cada numero de hilos
@@ -113,7 +130,7 @@ def graphSpeedUpM(speedUps, stdDev, n):
     ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
     
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Speedups for size 10^{0}'.format(n + 4))
+    fig.savefig('./Plots/Speedups for size 10^{0}'.format(n + 4))
     
 def graphThreadMean(means, stdDev, n):
     #Funcion que dada una lista de medias por hilos, 
@@ -135,12 +152,12 @@ def graphThreadMean(means, stdDev, n):
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
     plt.ylim([0,300])
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('Mean of execution time for {0} thread'.format(n + 1))
+    fig.savefig('./Plots/Mean of execution time for {0} thread'.format(n + 1))
 
 
 #USO DE TODAS LAS FUNCIONES
 
-df = pd.read_csv("time_data.csv")
+df = pd.read_csv("./data/time_data.csv")
 
 speedUps = getSpeedUp(df, 12)
 print("speedups: \n", speedUps)
@@ -162,6 +179,8 @@ stdThreads = getStdThread(df, 12)
 print("Standar desviation per thread:\n", stdThreads)
 
 
+createNeededFolders()
+
 #Grafica la media de los speedups para cada tamaño del arreglo
 for i in range(5):
     graphSpeedUpM(speedUps, speedUpsStdDev, i)
@@ -169,3 +188,5 @@ for i in range(5):
 #Grafica la media de tiempo de ejecucion para cada numero de hilos
 for i in range(12):
     graphThreadMean(meanThreads, stdThreads, i)
+
+
