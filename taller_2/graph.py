@@ -142,7 +142,7 @@ def graphSpeedUpM(speedUps, stdDev, n):
     ax1.fill_between(x, speedUpU, speedUpL, color = 'lightblue')
     
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('./results/Speedups for size {0}'.format(n))
+    fig.savefig('./plots/Speedups for size {0}'.format(n))
     
 def graphThreadMean(data, n):
     """
@@ -167,7 +167,7 @@ def graphThreadMean(data, n):
     ax1.fill_between(x, meanThreadP, meanThreadL, color = 'lightblue')
     plt.ylim([0,3.5])
     #Guarda la imagen en un archivo.jpg que esta en el pdf
-    fig.savefig('./results/Mean of execution time for {0} thread'.format(n))
+    fig.savefig('./plots/Mean of execution time for {0} thread'.format(n))
 
 
 
@@ -197,9 +197,9 @@ print(threadsData)
 print()
 
 try:
-      os.mkdir('./results')
+      os.mkdir('./plots')
 except: 
-    print("el directorio ./results ya existía, o hubo un error")
+    print("el directorio ./plots ya existía, o hubo un error")
 
 
 for i in [1000, 100000, 10000000]:
